@@ -27,6 +27,11 @@ class Member extends Model
         'initial_paid_up',
     ];
 
+    public function getAgeAttribute()
+    {
+        return \Carbon\Carbon::parse($this->birthdate)->age;
+    }
+
     public function attachments()
     {
         return $this->hasMany(Attachment::class);
