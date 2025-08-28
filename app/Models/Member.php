@@ -39,9 +39,9 @@ class Member extends Model
         return $this->hasMany(Attachment::class);
     }
 
-    public function borrowers()
+    public function loans()
     {
-        return $this->hasMany(Borrower::class);
+        return $this->hasMany(Loan::class);
     }
 
     public function civilStatus()

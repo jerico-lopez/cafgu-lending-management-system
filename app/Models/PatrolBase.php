@@ -14,6 +14,6 @@ class PatrolBase extends Model
 
     public function members()
     {
-        return $this->hasMany(Borrower::class);
+        return $this->hasMany(Loan::class);
     }
 }

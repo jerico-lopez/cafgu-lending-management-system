@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('borrowers', function (Blueprint $table) {
+        Schema::create('loans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('member_id')->constrained()->onDelete('cascade');
             $table->foreignId('patrol_base_id')->constrained()->onDelete('cascade');
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->decimal('zampen_benefits', 12, 2)->nullable();
             $table->decimal('processing_fee', 12, 2)->nullable();
             $table->decimal('total_deduction', 12, 2)->nullable();
-
+            $table->foreignId('loan_status_id')->constrained()->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('borrowers');
+        Schema::dropIfExists('loans');
     }
 };

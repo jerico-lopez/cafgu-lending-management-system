@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Borrower extends Model
+class Loan extends Model
 {
     use SoftDeletes;
     protected $fillable = [
@@ -20,7 +20,8 @@ class Borrower extends Model
         'share',
         'zampen_benefits',
         'processing_fee',
-        'total_deduction'
+        'total_deduction',
+        'loan_status_id'
     ];
 
     public function member()
@@ -31,5 +32,10 @@ class Borrower extends Model
     public function patrolBase()
     {
         return $this->belongsTo(PatrolBase::class);
+    }
+
+    public function loanStatus()
+    {
+        return $this->belongsTo(LoanStatus::class);
     }
 }
