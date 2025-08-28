@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('membership_type')->nullable();
             $table->decimal('initial_capital_subscription', 12, 2)->default(0);
             $table->decimal('initial_paid_up', 12, 2)->default(0);
+            $table->string('afp_id_issued')->nullable();
             $table->timestamps();
         });
     }
