@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('civil_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('status')->unique();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

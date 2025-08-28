@@ -27,6 +27,8 @@ return new class extends Migration
             $table->decimal('zampen_benefits', 12, 2)->nullable();
             $table->decimal('processing_fee', 12, 2)->nullable();
             $table->decimal('total_deduction', 12, 2)->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }
