@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->unsignedInteger('loan_term')->default(5); // Loan term in months
             $table->decimal('interest_rate', 5, 2)->default(3.00); // Interest rate
             $table->decimal('share_capital_rate', 5, 2)->default(2.00); // Share capital rate
-            $table->foreignId('loan_status_id')->constrained()->onDelete('cascade'); // Loan Status
+            $table->enum('status', ['pending', 'open', 'rejected'])->default('pending'); // Loan Status
             $table->decimal('share', 12, 2)->nullable(); // Accumulated unpaid share capital
             $table->decimal('zampen_benefits', 12, 2)->nullable();
             $table->decimal('processing_fee', 12, 2)->nullable();
