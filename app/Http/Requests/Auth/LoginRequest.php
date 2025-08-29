@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-    /**
+    /**username
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
@@ -67,7 +67,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => __('auth.throttle', [
+            'username' => __('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -79,7 +79,7 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return $this->string('email')
+        return $this->string('username')
             ->lower()
             ->append('|'.$this->ip())
             ->transliterate()
