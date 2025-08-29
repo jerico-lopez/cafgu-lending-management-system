@@ -65,11 +65,13 @@ class LoanController extends Controller
         }
 
         $loan->update(['status' => 'open']);
-        // Generate loan schedules
+        
+        // Computations
         $principalDeduction = $loan->principal / $loan->term_months;
         $interest = $loan->principal * ($loan->interest_rate / 100);
         $shareCapital = $loan->principal * ($loan->share_capital_rate / 100);
 
+        // Generate loan schedules
         for ($month = 1; $month <= $loan->term_months; $month++) {
             LoanSchedule::create([
                 'loan_id' => $loan->id,
