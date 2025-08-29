@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\Religion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class MemberController extends Controller
 {
