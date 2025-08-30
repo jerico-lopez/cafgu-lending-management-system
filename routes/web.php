@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LoanController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,8 +15,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
     Route::middleware(['admin'])->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::resource('loans', LoanController::class);
+
+        Route::controller(LoanController::class)->group(function () {
+            Route::put('/loans/{loan}/approve', 'approve')->name('loans.approve');
+        });
     });
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

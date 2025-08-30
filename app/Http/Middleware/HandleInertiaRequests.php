@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Loan;
+use App\Models\LoanSchedule;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -38,6 +40,8 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -46,6 +50,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'totalCollectible'=> $user->role === 'admin' ? Loan::whereMonth('created_at', now()->month)->sum('total_deduction') : null,
+            'collectibleLoans' => $user->role === 'admin' ? LoanSchedule::whereMonth('created_at', now()->month)->get() : null,
         ];
     }
 }
