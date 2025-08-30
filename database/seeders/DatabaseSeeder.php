@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Member;
+use App\Models\PatrolBase;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -19,12 +21,14 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+
         $this->call([
-            CivilStatusSeeder::class,
-            GenderSeeder::class,
             ReligionSeeder::class,
             RoleSeeder::class,
             AdminSeeder::class,
         ]);
+
+        Member::factory(2)->create();
+        PatrolBase::factory(5)->create();
     }
 }

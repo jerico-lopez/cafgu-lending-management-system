@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Member extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $fillable = [
         'last_name',
         'first_name',
@@ -15,15 +16,15 @@ class Member extends Model
         'address',
         'tin_number',
         'birthdate',
-        'gender_id',
-        'civil_status_id',
+        'gender',
+        'civil_status',
         'educational_attainment',
         'occupation',
         'number_of_dependents',
         'religion_id',
         'annual_income',
         'membership_number',
-        'bod_relationship',
+        'bod_resolution_number',
         'membership_type',
         'initial_capital_subscription',
         'initial_paid_up',
@@ -42,16 +43,6 @@ class Member extends Model
     public function loans()
     {
         return $this->hasMany(Loan::class);
-    }
-
-    public function civilStatus()
-    {
-        return $this->belongsTo(CivilStatus::class);
-    }
-
-    public function gender()
-    {
-        return $this->belongsTo(Gender::class);
     }
 
     public function religion()

@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('address');
             $table->string('tin_number', 15)->nullable()->unique();
             $table->date('birth_date')->nullable();
-            $table->foreignId('gender_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('civil_status_id')->nullable()->constrained()->onDelete('set null');
+            $table->enum('gender', ['male', 'female']);
+            $table->enum('civil_status', ['single', 'married', 'widowed', 'divorced']);
             $table->string('educational_attainment', 50)->nullable();
             $table->string('occupation', 100)->default('Unemployed');
             $table->integer('number_of_dependents')->default(0);

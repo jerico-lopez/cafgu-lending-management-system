@@ -36,14 +36,18 @@ class LoanController extends Controller
         $request->validate([
             'member_id' => 'required|exists:members,id',
             'patrol_base_id' => 'required|exists:patrol_bases,id',
-            'principal' => 'required|numeric|min:1000',
+            'principal_loan' => 'required|numeric|min:1000',
+            'previous_payment' => 'nullable|numeric|min:0',
+            'loan_term' => 'nullable|integer|min:1',
+            'interest_rate' => 'nullable|numeric|min:0',
+            'unpaid_share_capital_rate' => 'nullable|numeric|min:0',
+            'status' => 'nullable|string',
+            'share' => 'nullable|numeric|min:0',
+            'zampen_benefits' => 'nullable|numeric|min:0',
+            'processing_fee' => 'nullable|numeric|min:0',
         ]);
 
-        $loan = Loan::create([
-            'member_id' => $request->member_id,
-            'patrol_base_id' => $request->patrol_base_id,
-            'principal' => $request->principal,
-        ]);
+        Loan::create($request->all());
 
         return redirect()->route('loans.index')
             ->with('success', 'Loan created successfully with schedules.');
@@ -65,22 +69,22 @@ class LoanController extends Controller
         }
 
         $loan->update(['status' => 'open']);
-        
+
         // Computations
-        $principalDeduction = $loan->principal / $loan->term_months;
-        $interest = $loan->principal * ($loan->interest_rate / 100);
-        $shareCapital = $loan->principal * ($loan->share_capital_rate / 100);
+        $principalDeduction = $loan->principal_loan / $loan->loan_term;
+        $interest = $loan->principal_loan * ($loan->interest_rate / 100);
+        $shareCapital = $loan->principal_loan * ($loan->unpaid_share_capital_rate / 100);
 
         // Generate loan schedules
-        for ($month = 1; $month <= $loan->term_months; $month++) {
+        for ($month = 1; $month <= $loan->loan_term; $month++) {
             LoanSchedule::create([
                 'loan_id' => $loan->id,
                 'month_no' => $month,
                 'due_date' => now()->addMonths($month),
                 'principal_deduction' => $principalDeduction,
-                'interest' => $interest,
-                'share_capital' => $shareCapital,
-                'total_due' => $principalDeduction + $interest + $shareCapital,
+                'monthly_interest' => $interest,
+                'unpaid_share_capital' => $shareCapital,
+                'total_deduction' => $principalDeduction + $interest + $shareCapital,
             ]);
         }
     }

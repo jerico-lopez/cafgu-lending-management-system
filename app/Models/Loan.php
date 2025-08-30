@@ -11,17 +11,16 @@ class Loan extends Model
     protected $fillable = [
         'member_id',
         'patrol_base_id',
-        'principal',
-        'term_months',
+        'principal_loan',
+        'previous_payment',
+        'loan_term',
         'interest_rate',
-        'share_capital_rate',
-        'loan_status',
+        'unpaid_share_capital_rate',
+        'status',
+        'share',
+        'zampen_benefits',
+        'processing_fee',
     ];
-
-    public function loanStatus()
-    {
-        return $this->belongsTo(LoanStatus::class);
-    }
 
     public function member()
     {
