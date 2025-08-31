@@ -15,24 +15,27 @@ class Member extends Model
         'middle_name',
         'address',
         'tin_number',
-        'birthdate',
+        'birth_date',
         'gender',
         'civil_status',
         'educational_attainment',
         'occupation',
         'number_of_dependents',
-        'religion_id',
+        'religion',
         'annual_income',
         'membership_number',
         'bod_resolution_number',
         'membership_type',
         'initial_capital_subscription',
         'initial_paid_up',
+        'afp_issued_id',
     ];
+
+    protected $appends = ['age'];
 
     public function getAgeAttribute()
     {
-        return \Carbon\Carbon::parse($this->birthdate)->age;
+        return \Carbon\Carbon::parse($this->birth_date)->age;
     }
 
     public function attachments()
@@ -43,10 +46,5 @@ class Member extends Model
     public function loans()
     {
         return $this->hasMany(Loan::class);
-    }
-
-    public function religion()
-    {
-        return $this->belongsTo(Religion::class);
     }
 }

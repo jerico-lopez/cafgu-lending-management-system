@@ -28,14 +28,14 @@ class MemberFactory extends Factory
             'educational_attainment' => fake()->randomElement(['High School', 'College', 'Postgraduate']),
             'occupation' => fake()->jobTitle(),
             'number_of_dependents' => fake()->numberBetween(0, 5),
-            'religion_id' => fake()->randomElement([1, 2, 3]),
+            'religion' => fake()->randomElement(['Roman Catholic', 'Islam', 'Iglesia ni Cristo']),
             'annual_income' => fake()->randomFloat(2, 0, 100000),
             'membership_number' => fake()->unique()->numerify('MEM-#####'),
             'bod_resolution_number' => fake()->unique()->numerify('BOD-#####'),
             'membership_type' => fake()->randomElement(['Regular', 'Associate']),
             'initial_capital_subscription' => fake()->randomFloat(2, 0, 100000),
             'initial_paid_up' => fake()->randomFloat(2, 0, 100000),
-            'afp_id_issued' => fake()->unique()->numerify('AFP-#####'),
+            'afp_issued_id' => fake()->unique()->numerify('AFP-#####'),
         ];
     }
 }

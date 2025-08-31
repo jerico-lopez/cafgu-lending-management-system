@@ -23,7 +23,6 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            ReligionSeeder::class,
             RoleSeeder::class,
             AdminSeeder::class,
         ]);

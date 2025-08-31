@@ -7,91 +7,80 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useForm } from '@inertiajs/react';
 import { Edit, Plus, Search, Trash2, Upload } from 'lucide-react';
-import React, { useState } from 'react';
-
-const members: any[] = [];
+import React, { useEffect, useState } from 'react';
 
 const religionOptions = ['Catholic', 'Protestant', 'Islam', 'Buddhism', 'Others'];
 const genderOptions = ['Male', 'Female'];
-const civilStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
+const civil_statusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
 const educationOptions = ['Elementary', 'High School', 'College', 'Vocational', 'Graduate'];
 
-const Members: React.FC = () => {
+interface Props {
+    members: any[];
+}
+
+const Members = ({ members }: Props) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        lastName: '',
-        firstName: '',
-        middleName: '',
+
+    const { data, setData, post, processing, errors } = useForm({
+        last_name: '',
+        first_name: '',
+        middle_name: '',
         address: '',
-        tin: '',
-        dateOfBirth: '',
+        tin_number: '',
+        birth_date: '',
         gender: '',
-        civilStatus: '',
-        educationalAttainment: '',
+        civil_status: '',
+        educational_attainment: '',
         occupation: '',
-        dependents: '',
+        number_of_dependents: '',
         religion: '',
-        annualIncome: '',
-        membershipNumber: '',
-        bodResolutionNumber: '',
-        membershipType: '',
-        initialCapitalSubscription: '',
-        initialPaidUp: '',
-        afpIssuedId: '',
+        annual_income: '',
+        membership_number: '',
+        bod_resolution_number: '',
+        membership_type: '',
+        initial_capital_subscription: '',
+        initial_paid_up: '',
+        afp_issued_id: '',
     });
+
     const { toast } = useToast();
 
     const filteredMembers = members.filter(
         (member) =>
-            member.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            member.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            member.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            member.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             member.tin.includes(searchTerm),
     );
 
     const handleInputChange = (field: string, value: string) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
+        setData((prev) => ({ ...prev, [field]: value }));
 
         // Auto-calculate age when date of birth changes
         if (field === 'dateOfBirth' && value) {
             const birthDate = new Date(value);
             const today = new Date();
             const age = today.getFullYear() - birthDate.getFullYear();
-            setFormData((prev) => ({ ...prev, age: age.toString() }));
+            setData((prev) => ({ ...prev, age: age.toString() }));
         }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        post('members', {
+            onError: (errors) => {
+                Object.entries(errors).forEach(([field, messages]) => {
+                    // Ensure messages is always an array
+                    const msgArray = Array.isArray(messages) ? messages : [messages];
 
-        toast({
-            title: 'Member Added',
-            description: 'New member has been successfully registered',
+                    msgArray.forEach((msg, index) => {
+                        toast({ title: `${msg}`, duration: 5000, variant: 'destructive', key: `${index}` });
+                    });
+                });
+            }
         });
-
-        setFormData({
-            lastName: '',
-            firstName: '',
-            middleName: '',
-            address: '',
-            tin: '',
-            dateOfBirth: '',
-            gender: '',
-            civilStatus: '',
-            educationalAttainment: '',
-            occupation: '',
-            dependents: '',
-            religion: '',
-            annualIncome: '',
-            membershipNumber: '',
-            bodResolutionNumber: '',
-            membershipType: '',
-            initialCapitalSubscription: '',
-            initialPaidUp: '',
-            afpIssuedId: '',
-        });
-        setIsFormOpen(false);
     };
 
     return (
@@ -121,69 +110,70 @@ const Members: React.FC = () => {
                                     <h3 className="mb-4 text-lg font-semibold">Personal Information</h3>
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                         <div className="space-y-2">
-                                            <Label htmlFor="lastName">Last Name *</Label>
+                                            <Label htmlFor="last_name">Last Name *</Label>
                                             <Input
-                                                id="lastName"
-                                                value={formData.lastName}
-                                                onChange={(e) => handleInputChange('lastName', e.target.value)}
-                                                required
+                                                id="last_name"
+                                                value={data.last_name}
+                                                onChange={(e) => handleInputChange('last_name', e.target.value)}
                                             />
+                                            {errors.last_name && <p style={{ color: 'red' }}>{errors.last_name}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="firstName">First Name *</Label>
+                                            <Label htmlFor="first_name">First Name *</Label>
                                             <Input
-                                                id="firstName"
-                                                value={formData.firstName}
-                                                onChange={(e) => handleInputChange('firstName', e.target.value)}
-                                                required
+                                                id="first_name"
+                                                value={data.first_name}
+                                                onChange={(e) => handleInputChange('first_name', e.target.value)}
                                             />
+                                            {errors.first_name && <p style={{ color: 'red' }}>{errors.first_name}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="middleName">Middle Name</Label>
+                                            <Label htmlFor="middle_name">Middle Name</Label>
                                             <Input
-                                                id="middleName"
-                                                value={formData.middleName}
-                                                onChange={(e) => handleInputChange('middleName', e.target.value)}
+                                                id="middle_name"
+                                                value={data.middle_name}
+                                                onChange={(e) => handleInputChange('middle_name', e.target.value)}
                                             />
+                                            {errors.middle_name && <p style={{ color: 'red' }}>{errors.middle_name}</p>}
                                         </div>
 
                                         <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="address">Address *</Label>
                                             <Textarea
                                                 id="address"
-                                                value={formData.address}
+                                                value={data.address}
                                                 onChange={(e) => handleInputChange('address', e.target.value)}
-                                                required
                                             />
+                                            {errors.address && <p style={{ color: 'red' }}>{errors.address}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="tin">TIN *</Label>
+                                            <Label htmlFor="tin_number">TIN_number *</Label>
                                             <Input
-                                                id="tin"
-                                                value={formData.tin}
-                                                onChange={(e) => handleInputChange('tin', e.target.value)}
+                                                id="tin_number"
+                                                value={data.tin_number}
+                                                onChange={(e) => handleInputChange('tin_number', e.target.value)}
                                                 placeholder="XXX-XXX-XXX-XXX"
-                                                required
                                             />
+                                            {errors.tin_number && <p style={{ color: 'red' }}>{errors.tin_number}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="dateOfBirth">Date of Birth *</Label>
+                                            <Label htmlFor="birth_date">Date of Birth *</Label>
                                             <Input
-                                                id="dateOfBirth"
+                                                id="birth_date"
                                                 type="date"
-                                                value={formData.dateOfBirth}
-                                                onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                                                required
+                                                value={data.birth_date}
+                                                onChange={(e) => handleInputChange('birth_date', e.target.value)}
                                             />
+                                            {errors.birth_date && <p style={{ color: 'red' }}>{errors.birth_date}</p>}
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="gender">Gender *</Label>
-                                            <Select value={formData.gender} onValueChange={(value) => handleInputChange('gender', value)}>
+                                            <Select value={data.gender} onValueChange={(value) => handleInputChange('gender', value)}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select gender" />
                                                 </SelectTrigger>
@@ -195,29 +185,31 @@ const Members: React.FC = () => {
                                                     ))}
                                                 </SelectContent>
                                             </Select>
+                                            {errors.gender && <p style={{ color: 'red' }}>{errors.gender}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="civilStatus">Civil Status *</Label>
-                                            <Select value={formData.civilStatus} onValueChange={(value) => handleInputChange('civilStatus', value)}>
+                                            <Label htmlFor="civil_status">Civil Status *</Label>
+                                            <Select value={data.civil_status} onValueChange={(value) => handleInputChange('civil_status', value)}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select civil status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {civilStatusOptions.map((option) => (
+                                                    {civil_statusOptions.map((option) => (
                                                         <SelectItem key={option} value={option}>
                                                             {option}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
+                                            {errors.civil_status && <p style={{ color: 'red' }}>{errors.civil_status}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="educationalAttainment">Educational Attainment</Label>
+                                            <Label htmlFor="educational_attainment">Educational Attainment</Label>
                                             <Select
-                                                value={formData.educationalAttainment}
-                                                onValueChange={(value) => handleInputChange('educationalAttainment', value)}
+                                                value={data.educational_attainment}
+                                                onValueChange={(value) => handleInputChange('educational_attainment', value)}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select education level" />
@@ -230,52 +222,57 @@ const Members: React.FC = () => {
                                                     ))}
                                                 </SelectContent>
                                             </Select>
+                                            {errors.educational_attainment && <p style={{ color: 'red' }}>{errors.educational_attainment}</p>}
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="occupation">Occupation</Label>
                                             <Input
                                                 id="occupation"
-                                                value={formData.occupation}
+                                                value={data.occupation}
                                                 onChange={(e) => handleInputChange('occupation', e.target.value)}
                                             />
+                                            {errors.occupation && <p style={{ color: 'red' }}>{errors.occupation}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="dependents">Number of Dependents</Label>
+                                            <Label htmlFor="number_of_dependents">Number of Dependents</Label>
                                             <Input
-                                                id="dependents"
+                                                id="number_of_dependents"
                                                 type="number"
-                                                value={formData.dependents}
-                                                onChange={(e) => handleInputChange('dependents', e.target.value)}
+                                                value={data.number_of_dependents}
+                                                onChange={(e) => handleInputChange('number_of_dependents', e.target.value)}
                                             />
+                                            {errors.number_of_dependents && <p style={{ color: 'red' }}>{errors.number_of_dependents}</p>}
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="religion">Religion</Label>
-                                            <Select value={formData.religion} onValueChange={(value) => handleInputChange('religion', value)}>
+                                            <Select value={data.religion} onValueChange={(value) => handleInputChange('religion', value)}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select religion" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {religionOptions.map((option) => (
-                                                        <SelectItem key={option} value={option}>
-                                                            {option}
+                                                    {religionOptions.map((religion) => (
+                                                        <SelectItem key={religion} value={religion}>
+                                                            {religion}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
+                                            {errors.religion && <p style={{ color: 'red' }}>{errors.religion}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="annualIncome">Annual Income</Label>
+                                            <Label htmlFor="annual_income">Annual Income</Label>
                                             <Input
-                                                id="annualIncome"
+                                                id="annual_income"
                                                 type="number"
-                                                value={formData.annualIncome}
-                                                onChange={(e) => handleInputChange('annualIncome', e.target.value)}
+                                                value={data.annual_income}
+                                                onChange={(e) => handleInputChange('annual_income', e.target.value)}
                                                 placeholder="₱"
                                             />
+                                            {errors.annual_income && <p style={{ color: 'red' }}>{errors.annual_income}</p>}
                                         </div>
                                     </div>
                                 </div>
@@ -285,28 +282,30 @@ const Members: React.FC = () => {
                                     <h3 className="mb-4 text-lg font-semibold">Membership Information</h3>
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                         <div className="space-y-2">
-                                            <Label htmlFor="membershipNumber">Membership Number</Label>
+                                            <Label htmlFor="membership_number">Membership Number</Label>
                                             <Input
-                                                id="membershipNumber"
-                                                value={formData.membershipNumber}
-                                                onChange={(e) => handleInputChange('membershipNumber', e.target.value)}
+                                                id="membership_number"
+                                                value={data.membership_number}
+                                                onChange={(e) => handleInputChange('membership_number', e.target.value)}
                                             />
+                                            {errors.membership_number && <p style={{ color: 'red' }}>{errors.membership_number}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="bodResolutionNumber">BOD Resolution Number</Label>
+                                            <Label htmlFor="bod_resolution_number">BOD Resolution Number</Label>
                                             <Input
-                                                id="bodResolutionNumber"
-                                                value={formData.bodResolutionNumber}
-                                                onChange={(e) => handleInputChange('bodResolutionNumber', e.target.value)}
+                                                id="bod_resolution_number"
+                                                value={data.bod_resolution_number}
+                                                onChange={(e) => handleInputChange('bod_resolution_number', e.target.value)}
                                             />
+                                            {errors.bod_resolution_number && <p style={{ color: 'red' }}>{errors.bod_resolution_number}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="membershipType">Membership Type</Label>
+                                            <Label htmlFor="membership_type">Membership Type</Label>
                                             <Select
-                                                value={formData.membershipType}
-                                                onValueChange={(value) => handleInputChange('membershipType', value)}
+                                                value={data.membership_type}
+                                                onValueChange={(value) => handleInputChange('membership_type', value)}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select membership type" />
@@ -317,37 +316,41 @@ const Members: React.FC = () => {
                                                     <SelectItem value="honorary">Honorary</SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                            {errors.membership_type && <p style={{ color: 'red' }}>{errors.membership_type}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="initialCapitalSubscription">Initial Capital Subscription</Label>
+                                            <Label htmlFor="initial_capital_subscription">Initial Capital Subscription</Label>
                                             <Input
-                                                id="initialCapitalSubscription"
+                                                id="initial_capital_subscription"
                                                 type="number"
-                                                value={formData.initialCapitalSubscription}
-                                                onChange={(e) => handleInputChange('initialCapitalSubscription', e.target.value)}
+                                                value={data.initial_capital_subscription}
+                                                onChange={(e) => handleInputChange('initial_capital_subscription', e.target.value)}
                                                 placeholder="₱"
                                             />
+                                            {errors.initial_capital_subscription && <p style={{ color: 'red' }}>{errors.initial_capital_subscription}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="initialPaidUp">Initial Paid-Up</Label>
+                                            <Label htmlFor="initial_paid_up">Initial Paid-Up</Label>
                                             <Input
-                                                id="initialPaidUp"
+                                                id="initial_paid_up"
                                                 type="number"
-                                                value={formData.initialPaidUp}
-                                                onChange={(e) => handleInputChange('initialPaidUp', e.target.value)}
+                                                value={data.initial_paid_up}
+                                                onChange={(e) => handleInputChange('initial_paid_up', e.target.value)}
                                                 placeholder="₱"
                                             />
+                                            {errors.initial_paid_up && <p style={{ color: 'red' }}>{errors.initial_paid_up}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="afpIssuedId">AFP Issued ID</Label>
+                                            <Label htmlFor="afp_issued_id">AFP Issued ID</Label>
                                             <Input
-                                                id="afpIssuedId"
-                                                value={formData.afpIssuedId}
-                                                onChange={(e) => handleInputChange('afpIssuedId', e.target.value)}
+                                                id="afp_issued_id"
+                                                value={data.afp_issued_id}
+                                                onChange={(e) => handleInputChange('afp_issued_id', e.target.value)}
                                             />
+                                            {errors.afp_issued_id && <p style={{ color: 'red' }}>{errors.afp_issued_id}</p>}
                                         </div>
                                     </div>
                                 </div>
@@ -412,13 +415,13 @@ const Members: React.FC = () => {
                                     {filteredMembers.map((member) => (
                                         <TableRow key={member.id}>
                                             <TableCell className="font-medium">
-                                                {`${member.firstName} ${member.middleName} ${member.lastName}`}
+                                                {`${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name}`}
                                             </TableCell>
-                                            <TableCell className="font-mono">{member.tin}</TableCell>
-                                            <TableCell>{member.dateOfBirth}</TableCell>
+                                            <TableCell className="font-mono">{member.tin_number}</TableCell>
+                                            <TableCell>{member.birth_date}</TableCell>
                                             <TableCell>{member.age}</TableCell>
                                             <TableCell>{member.gender}</TableCell>
-                                            <TableCell>{member.civilStatus}</TableCell>
+                                            <TableCell>{member.civil_status}</TableCell>
                                             <TableCell>{member.occupation}</TableCell>
                                             <TableCell>
                                                 <div className="flex gap-2">

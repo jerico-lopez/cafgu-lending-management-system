@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\CivilStatus;
 use App\Models\Gender;
 use App\Models\Member;
-use App\Models\Religion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -14,25 +13,16 @@ class MemberController extends Controller
 {
     public function index()
     {
-        return Inertia::render('members/index');
+        $members = Member::all();
+        return Inertia::render('members/index', [
+            'members' => $members,
+        ]);
     }
 
     public function show(Member $member)
     {
         return Inertia::render('members/show', [
             'member' => $member
-        ]);
-    }
-
-    public function create()
-    {
-        $civil_statuses = CivilStatus::all();
-        $genders = Gender::all();
-        $religions = Religion::all();
-        return Inertia::render('members/create', [
-            'civil_statuses' => $civil_statuses,
-            'genders' => $genders,
-            'religions' => $religions
         ]);
     }
 
@@ -43,21 +33,21 @@ class MemberController extends Controller
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'address' => 'required|string|max:255',
-            'tin_number' => 'required|string|max:255',
+            'tin_number' => 'nullable|string|max:255|unique:members,tin_number',
             'birth_date' => 'required|date',
-            'gender_id' => 'required|exists:genders,id',
-            'civil_status_id' => 'required|exists:civil_statuses,id',
-            'educational_attainment' => 'required|string|max:255',
-            'occupation' => 'required|string|max:255',
-            'number_of_dependents' => 'required|integer|min:0',
-            'religion_id' => 'required|exists:religions,id',
-            'annual_income' => 'required|numeric|min:0',
-            'membership_number' => 'required|string|max:255',
-            'bod_relationship' => 'required|string|max:255',
-            'membership_type' => 'required|string|max:255',
-            'initial_capital_subscription' => 'required|numeric|min:0',
-            'initial_paid_up' => 'required|numeric|min:0',
-            'afp_id_issued' => 'required|string|max:255',
+            'gender' => 'required',
+            'civil_status' => 'required',
+            'educational_attainment' => 'nullable|string|max:255',
+            'occupation' => 'nullable|string|max:255',
+            'number_of_dependents' => 'nullable|integer|min:0',
+            'religion' => 'nullable',
+            'annual_income' => 'nullable|numeric|min:0',
+            'membership_number' => 'nullable|string|max:255|unique:members,membership_number',
+            'bod_resolution_number' => 'nullable|string|max:255|unique:members,bod_resolution_number',
+            'membership_type' => 'nullable|string|max:255',
+            'initial_capital_subscription' => 'nullable|numeric|min:0',
+            'initial_paid_up' => 'nullable|numeric|min:0',
+            'afp_issued_id' => 'nullable|string|max:255|unique:members,afp_issued_id',
         ]);
 
         $member = Member::create($validated_data);
@@ -85,7 +75,7 @@ class MemberController extends Controller
             }
         }
 
-        return redirect()->route('members.index');
+        return Inertia::location(route('members.index'));
     }
 
     public function edit(Member $member)
@@ -108,7 +98,7 @@ class MemberController extends Controller
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'address' => 'required|string|max:255',
-            'tin_number' => 'required|string|max:255',
+            'tin_number' => 'required|string|max:255|unique:members,tin_number,' . $member->id,
             'birth_date' => 'required|date',
             'gender_id' => 'required|exists:genders,id',
             'civil_status_id' => 'required|exists:civil_statuses,id',
