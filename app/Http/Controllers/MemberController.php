@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CivilStatus;
-use App\Models\Gender;
 use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -80,14 +78,8 @@ class MemberController extends Controller
 
     public function edit(Member $member)
     {
-        $civil_statuses = CivilStatus::all();
-        $genders = Gender::all();
-        $religions = Religion::all();
         return Inertia::render('members/edit', [
-            'member' => $member,
-            'civil_statuses' => $civil_statuses,
-            'genders' => $genders,
-            'religions' => $religions
+            'member' => $member
         ]);
     }
 

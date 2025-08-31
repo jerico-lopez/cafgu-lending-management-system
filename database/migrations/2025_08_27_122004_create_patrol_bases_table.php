@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('patrol_bases', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->string('location')->nullable();
+            $table->string('command_officer')->nullable();
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
             $table->softDeletes();
             $table->timestamps();
         });

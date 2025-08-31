@@ -19,7 +19,7 @@ const navigation: NavItem[] = [
     { title: 'Borrowers', href: '/borrowers', icon: UserPlus },
     { title: 'Members', href: '/members', icon: Users },
     { title: 'Loans', href: '/loans', icon: CreditCard },
-    { title: 'Patrol Base', href: '/patrol-base', icon: Building2 },
+    { title: 'Patrol Base', href: '/patrol-bases', icon: Building2 },
     { title: 'Users', href: '/users', icon: Shield },
     { title: 'PRINTABLES', href: '', icon: FileText, isHeader: true },
     { title: 'Reports', href: '/reports', icon: FileText },

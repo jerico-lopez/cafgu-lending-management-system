@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
         ]);
 
-        Member::factory(2)->create();
+        Member::factory(10)->create();
         PatrolBase::factory(5)->create();
     }
 }

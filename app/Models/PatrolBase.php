@@ -10,7 +10,10 @@ class PatrolBase extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable = [
-        'name'
+        'name',
+        'location',
+        'command_officer',
+        'status'
     ];
 
     public function members()

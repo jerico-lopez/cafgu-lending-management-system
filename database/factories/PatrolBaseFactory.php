@@ -17,7 +17,10 @@ class PatrolBaseFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->address(),
+            'name' => $this->faker->company(),
+            'location' => $this->faker->address(),
+            'command_officer' => $this->faker->name(),
+            'status' => $this->faker->randomElement(['Active', 'Inactive']),
         ];
     }
 }

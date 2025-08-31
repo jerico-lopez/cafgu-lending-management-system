@@ -4,29 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\PatrolBase;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PatrolBaseController extends Controller
 {
     public function index()
     {
-        $patrolBases = PatrolBase::all();
-        return view('patrol_bases.index', compact('patrolBases'));
-    }
-
-    public function create()
-    {
-        return view('patrol_bases.create');
+        $patrol_bases = PatrolBase::all();
+        return Inertia::render('patrol_bases/index', compact('patrol_bases'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'command_officer' => 'nullable|string|max:255',
         ]);
 
-        PatrolBase::create($request->only('name'));
+        PatrolBase::create($request->only('name', 'location', 'command_officer'));
 
-        return redirect()->route('patrol_bases.index');
+        return Inertia::location(route('patrol-bases.index'));
     }
 
     public function show(PatrolBase $patrolBase)
