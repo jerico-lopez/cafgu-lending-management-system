@@ -15,8 +15,8 @@ return new class extends Migration {
             $table->foreignId('loan_id')->constrained()->cascadeOnDelete();
             $table->foreignId('loan_schedule_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('amount', 12, 2);
-            $table->date('paid_at');
             $table->string('or_number', 50)->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

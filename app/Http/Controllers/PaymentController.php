@@ -29,10 +29,9 @@ class PaymentController extends Controller
     {
         $request->validate([
             'loan_id' => 'required|exists:loans,id',
-            'loan_schedule_id' => 'nullable|exists:loan_schedules,id',
+            'loan_schedule_id' => 'required|exists:loan_schedules,id',
             'amount' => 'required|numeric|min:1',
-            'paid_at' => 'required|date',
-            'or_number' => 'required|string',
+            'or_number' => 'nullable|string',
         ]);
 
         $loan = Loan::find($request->loan_id);

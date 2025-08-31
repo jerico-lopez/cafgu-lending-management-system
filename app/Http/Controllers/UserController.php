@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -26,7 +27,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::where('name', '!=', 'admin')->get();
         return Inertia::render('users/create', [
             'roles' => $roles
         ]);
@@ -38,10 +39,16 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role_id' => 'required|exists:roles,id',
+            'role' => [
+                'required',
+                Rule::exists('roles', 'name')->where(function ($query) {
+                    $query->where('name', '!=', 'admin');
+                }),
+            ], // Validate that the role exists and is not 'admin'
         ]);
 
-        User::create($request->only('name', 'email', 'password', 'role_id'));
+        $user = User::create($request->only('name', 'email', 'password'));
+        $user->assignRole($request->role);
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
@@ -61,15 +68,22 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
-            'role_id' => 'required|exists:roles,id',
+            'role' => [
+                'required',
+                Rule::exists('roles', 'name')->where(function ($query) {
+                    $query->where('name', '!=', 'admin');
+                }),
+            ], // Validate that the role exists and is not 'admin'
         ]);
 
-        $data = $request->only('name', 'email', 'role_id');
+        $data = $request->only('name', 'email');
+
         if ($request->filled('password')) {
             $data['password'] = $request->input('password');
         }
 
         $user->update($data);
+        $user->syncRoles($request->role);
 
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }

@@ -13,12 +13,7 @@ class Payment extends Model
         'loan_id',
         'loan_schedule_id',
         'amount',
-        'paid_at',
         'or_number',
-    ];
-
-    protected $casts = [
-        'paid_at' => 'date',
     ];
 
     // Relations

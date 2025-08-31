@@ -2,6 +2,7 @@
 
 use App\Models\Loan;
 use App\Models\LoanSchedule;
+use App\Models\Payment;
 use App\Models\User;
 
 test('authenticated users can visit the loans', function () {
@@ -81,11 +82,13 @@ test('a payment can be made for a loan', function () {
         'principal_loan' => 10000,
     ]);
 
-    $this->put("/loans/1/approve");
+    $this->put("/loans/1/approve")->assertOk();
 
-    $this->post("/loans/1/payments", [
+    $this->post("/payments", [
+        'loan_id' => 1,
+        'loan_schedule_id' => 1,
         'amount' => 2500,
-    ]);
+    ])->assertOk();
 
     $this->assertDatabaseHas('payments', [
         'loan_id' => 1,

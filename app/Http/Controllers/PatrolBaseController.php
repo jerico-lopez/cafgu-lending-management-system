@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PatrolBase;
 use Illuminate\Http\Request;
 
 class PatrolBaseController extends Controller
