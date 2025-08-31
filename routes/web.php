@@ -1,14 +1,11 @@
 <?php
 
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
@@ -27,6 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/payments/create', 'create')->name('payments.create');
             Route::post('/payments', 'store')->name('payments.store');
         });
+        
+        Route::resource('members', MemberController::class);
     });
 });
 

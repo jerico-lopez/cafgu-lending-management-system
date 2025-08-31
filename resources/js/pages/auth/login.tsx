@@ -1,88 +1,120 @@
-import AuthenticatedSessionController from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
-import { register } from '@/routes';
-import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import React from "react";
+import { useForm } from "@inertiajs/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface LoginProps {
-    status?: string;
-    canResetPassword: boolean;
-}
+const authBg = "/lovable-uploads/f79c8a91-7753-4751-8606-1624c268d377.png";
+const bayanLogo = "/lovable-uploads/c220bffd-33c5-49db-b365-5c1a2681bdc8.png";
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login() {
+    const { data, setData, post, processing, errors } = useForm({
+        username: "",
+        password: "",
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post("/");
+    };
+
     return (
-        <AuthLayout title="Log in to your account" description="Enter your username and password below to log in">
-            <Head title="Log in" />
+        <div className="min-h-screen flex">
+            {/* Left Side - Background Image */}
+            <div
+                className="hidden lg:flex lg:w-1/2 bg-contain bg-center bg-no-repeat relative"
+                style={{ backgroundImage: `url(${authBg})` }}
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary-dark/60" />
+                <div className="relative z-10 flex flex-col justify-center p-12 text-white">
+                    <h1 className="text-4xl font-bold mb-4">Lending System</h1>
+                    <p className="text-xl opacity-90 mb-6">
+                        Secure financial management system
+                    </p>
+                </div>
+            </div>
 
-            <Form {...AuthenticatedSessionController.store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="username">Username</Label>
-                                <Input
-                                    id="username"
-                                    type="username"
-                                    name="username"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="username"
-                                    placeholder="Username"
-                                />
-                                <InputError message={errors.username} />
-                            </div>
+            {/* Right Side - Auth Form */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
+                <div className="w-full max-w-md">
+                    {/* Logo/Title */}
+                    <div className="text-center mb-8">
+                        <div className="flex justify-center mb-4">
+                            <img
+                                src={bayanLogo}
+                                alt="Bayan ng Tungawan Logo"
+                                className="h-20 w-20 object-contain"
+                            />
+                        </div>
+                        <h2 className="text-2xl font-bold text-primary mb-2">
+                            Bayang Tungawan
+                        </h2>
+                    </div>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink href={request()} className="ml-auto text-sm" tabIndex={5}>
-                                            Forgot password?
-                                        </TextLink>
+                    <Card className="border-border/50 shadow-[var(--shadow-soft)]">
+                        <CardHeader className="text-center">
+                            <CardTitle className="text-2xl">
+                                Welcome Back
+                            </CardTitle>
+                            <CardDescription>
+                                Sign in to access your account
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="username">Username</Label>
+                                    <Input
+                                        id="username"
+                                        name="username"
+                                        type="text"
+                                        value={data.username}
+                                        onChange={(e) =>
+                                            setData("username", e.target.value)
+                                        }
+                                        required
+                                        placeholder="Enter your username"
+                                    />
+                                    {errors.username && (
+                                        <div className="text-red-500 text-sm">
+                                            {errors.username}
+                                        </div>
                                     )}
                                 </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
 
-                            <div className="flex items-center space-x-3">
-                                <Checkbox id="remember" name="remember" tabIndex={3} />
-                                <Label htmlFor="remember">Remember me</Label>
-                            </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="password">Password</Label>
+                                    <Input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        value={data.password}
+                                        onChange={(e) =>
+                                            setData("password", e.target.value)
+                                        }
+                                        required
+                                        placeholder="Enter your password"
+                                    />
+                                    {errors.password && (
+                                        <div className="text-red-500 text-sm">
+                                            {errors.password}
+                                        </div>
+                                    )}
+                                </div>
 
-                            <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                                {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                Log in
-                            </Button>
-                        </div>
-
-                        <div className="text-center text-sm text-muted-foreground">
-                            Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                Sign up
-                            </TextLink>
-                        </div>
-                    </>
-                )}
-            </Form>
-
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
-        </AuthLayout>
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    disabled={processing}
+                                >
+                                    {processing ? "Signing in..." : "Sign In"}
+                                </Button>
+                            </form>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
     );
 }
