@@ -12,8 +12,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
-    Route::middleware(['role:admin'])->group(function () {
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::middleware(['role:Admin'])->group(function () {
+        Route::resource('users', UserController::class);
         Route::resource('loans', LoanController::class);
 
         Route::controller(LoanController::class)->group(function () {

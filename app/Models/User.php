@@ -48,4 +48,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    protected $appends = ['role'];
+
+    public function getRoleAttribute(): string
+    {
+        return $this->roles->first()->name ?? 'No Role';
+    }
 }

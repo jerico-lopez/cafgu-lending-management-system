@@ -25,32 +25,25 @@ class UserController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        $roles = Role::where('name', '!=', 'admin')->get();
-        return Inertia::render('users/create', [
-            'roles' => $roles
-        ]);
-    }
-
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'role' => [
                 'required',
-                Rule::exists('roles', 'name')->where(function ($query) {
-                    $query->where('name', '!=', 'admin');
-                }),
-            ], // Validate that the role exists and is not 'admin'
+                Rule::exists('roles', 'name')->whereNot('name', 'Admin'),
+            ], // Validate that the role exists and is not 'Admin'
         ]);
 
-        $user = User::create($request->only('name', 'email', 'password'));
+        $request['password'] = bcrypt($request['password']);
+
+        $user = User::create($request->only('name', 'username', 'email', 'password'));
         $user->assignRole($request->role);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return Inertia::location(route('users.index'));
     }
 
     public function edit(User $user)
