@@ -97,7 +97,7 @@ class LoanController extends Controller
             return redirect()->back()->with('error', 'Only pending loans can be approved.');
         }
 
-        $loan->update(['status' => 'Open']);
+        $loan->update(['status' => 'Open', 'date_approved' => now()]);
 
         // Generate loan schedules
         for ($month = 1; $month <= $loan->loan_term; $month++) {

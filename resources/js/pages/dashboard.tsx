@@ -1,52 +1,80 @@
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, CreditCard, DollarSign, TrendingUp, Users } from 'lucide-react';
-import React from 'react';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 // Empty data - ready for database integration
 const patrolBaseData: any[] = [];
 const monthlyCollectionData: any[] = [];
 
-const kpiData = [
-    {
-        title: 'Borrowed Amounts',
-        value: '₱0.00',
-        change: 'No data',
-        icon: DollarSign,
-        trend: 'up',
-    },
-    {
-        title: 'Total Members',
-        value: '0',
-        change: 'No data',
-        icon: Users,
-        trend: 'up',
-    },
-    {
-        title: 'Members with Loans',
-        value: '0',
-        change: 'No data',
-        icon: CreditCard,
-        trend: 'up',
-    },
-    {
-        title: 'Past Due Loans',
-        value: '0',
-        change: 'No data',
-        icon: AlertCircle,
-        trend: 'down',
-    },
-    {
-        title: 'Collectible this Month',
-        value: '₱0.00',
-        change: 'No data',
-        icon: TrendingUp,
-        trend: 'up',
-    },
-];
+interface MembersData {
+    value: number;
+    change: string;
+    trend: string;
+}
 
-const Dashboard: React.FC = () => {
+interface LoanData {
+    value: number;
+    change: string;
+    trend: string;
+}
+
+interface MembersLoanData {
+    value: number;
+    change: string;
+    trend: string;
+}
+
+interface PastDueLoansData{
+    value: number;
+}
+
+interface CollectiblesData{
+    value: number;
+}
+
+interface Props {
+    loan_data: LoanData;
+    members_data: MembersData;
+    members_loan_data: MembersLoanData;
+    past_due_loans_data: PastDueLoansData;
+    collectibles_data: CollectiblesData
+}
+
+const Dashboard = ({ loan_data, members_data, members_loan_data, past_due_loans_data, collectibles_data }: Props) => {
+    const kpiData = [
+        {
+            title: 'Borrowed Amounts',
+            value: loan_data.value.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }),
+            change: 'No data',
+            icon: DollarSign,
+            trend: 'up',
+        },
+        {
+            title: 'Total Members',
+            value: members_data.value.toString(),
+            change: members_data.change + ' this month',
+            icon: Users,
+            trend: members_data.trend,
+        },
+        {
+            title: 'Members with Loans',
+            value: members_loan_data.value,
+            change: members_loan_data.change,
+            icon: CreditCard,
+            trend: members_loan_data.trend,
+        },
+        {
+            title: 'Past Due Loans',
+            value: past_due_loans_data.value,
+            icon: AlertCircle,
+        },
+        {
+            title: 'Collectible this Month',
+            value: collectibles_data.value.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }),
+            icon: TrendingUp,
+        },
+    ];
     return (
         <Layout>
             <div className="page-container">
@@ -66,14 +94,16 @@ const Dashboard: React.FC = () => {
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate text-xs font-medium text-muted-foreground sm:text-sm">{kpi.title}</p>
                                         <p className="mt-1 text-xl font-bold text-foreground sm:text-2xl">{kpi.value}</p>
-                                        <p
-                                            className={`mt-2 flex items-center gap-1 text-xs ${
-                                                kpi.trend === 'up' ? 'text-success' : 'text-destructive'
-                                            }`}
-                                        >
-                                            <TrendingUp className={`h-3 w-3 ${kpi.trend === 'down' ? 'rotate-180' : ''}`} />
-                                            <span className="truncate">{kpi.change}</span>
-                                        </p>
+                                        {kpi.change && (
+                                            <p
+                                                className={`mt-2 flex items-center gap-1 text-xs ${
+                                                    kpi.trend === 'up' ? 'text-success' : 'text-destructive'
+                                                }`}
+                                            >
+                                                <TrendingUp className={`h-3 w-3 ${kpi.trend === 'down' ? 'rotate-180' : ''}`} />
+                                                <span className="truncate">{kpi.change}</span>
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="ml-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 sm:h-12 sm:w-12">
                                         <kpi.icon className="h-5 w-5 text-primary sm:h-6 sm:w-6" />

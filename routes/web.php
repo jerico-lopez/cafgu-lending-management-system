@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\BorrowerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PatrolBaseController;
@@ -12,9 +13,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::middleware(['role:Admin'])->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('loans', LoanController::class);
