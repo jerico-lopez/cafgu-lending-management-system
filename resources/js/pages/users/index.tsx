@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Edit, Plus, Search, Shield, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
@@ -75,23 +75,6 @@ const Users = ({ users }: Props) => {
         toast({
             title: 'Edit User',
             description: `Editing user: ${user.name}`,
-        });
-    };
-
-    const handleDelete = (user: any) => {
-        if (user.username === 'admin') {
-            toast({
-                title: 'Cannot Delete',
-                description: 'Administrator account cannot be deleted',
-                variant: 'destructive',
-            });
-            return;
-        }
-
-        toast({
-            title: 'User Deleted',
-            description: `${user.name} has been removed`,
-            variant: 'destructive',
         });
     };
 
@@ -274,7 +257,7 @@ const Users = ({ users }: Props) => {
                                                     <Button
                                                         variant="destructive"
                                                         size="sm"
-                                                        onClick={() => handleDelete(user)}
+                                                        onClick={() => router.delete(`/users/${user.id}`)}
                                                         disabled={user.username === 'admin'}
                                                     >
                                                         <Trash2 className="mr-1 h-4 w-4" />
