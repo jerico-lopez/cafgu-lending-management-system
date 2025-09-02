@@ -52,7 +52,7 @@ const Members = ({ members }: Props) => {
         (member) =>
             member.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             member.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            member.tin.includes(searchTerm),
+            member.tin_number.includes(searchTerm),
     );
 
     const handleInputChange = (field: string, value: string) => {
