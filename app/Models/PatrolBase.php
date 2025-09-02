@@ -16,7 +16,7 @@ class PatrolBase extends Model
         'status'
     ];
 
-    public function members()
+    public function loans()
     {
         return $this->hasMany(Loan::class);
     }

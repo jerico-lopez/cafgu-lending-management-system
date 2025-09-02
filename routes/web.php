@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BorrowerController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PatrolBaseController;
@@ -25,7 +26,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/payments/create', 'create')->name('payments.create');
             Route::post('/payments', 'store')->name('payments.store');
         });
-        
+
+        Route::controller(BorrowerController::class)->group(function () {
+            Route::get('/borrowers', 'index')->name('borrowers.index');
+            Route::post('/borrowers', 'store')->name('borrowers.store');
+        });
+
         Route::resource('members', MemberController::class);
         Route::resource('patrol-bases', PatrolBaseController::class);
     });
