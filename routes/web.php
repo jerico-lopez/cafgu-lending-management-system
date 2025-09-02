@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\BorrowerController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\MemberController;
@@ -35,6 +36,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::controller(ReportController::class)->group(function () {
             Route::get('/reports', 'index')->name('reports.index');
+        });
+
+        Route::controller(AnalyticsController::class)->group(function () {
+            Route::get('/analytics', 'index')->name('analytics.index');
         });
 
         Route::resource('members', MemberController::class);
