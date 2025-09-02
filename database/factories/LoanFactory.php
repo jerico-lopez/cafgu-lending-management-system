@@ -47,7 +47,6 @@ class LoanFactory extends Factory
             'total_deduction' => $total_deductions,
             'net_amount' => $principal_loan - $total_deductions,
             'monthly_payment' => ($principal_loan + $monthly_interest) / $term,
-            'date_approved' => $this->faker->date(),
         ];
     }
 }
