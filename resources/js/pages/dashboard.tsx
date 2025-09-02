@@ -3,10 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, CreditCard, DollarSign, TrendingUp, Users } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-// Empty data - ready for database integration
-const patrolBaseData: any[] = [];
-const monthlyCollectionData: any[] = [];
-
 interface MembersData {
     value: number;
     change: string;
@@ -38,10 +34,12 @@ interface Props {
     members_data: MembersData;
     members_loan_data: MembersLoanData;
     past_due_loans_data: PastDueLoansData;
-    collectibles_data: CollectiblesData
+    collectibles_data: CollectiblesData;
+    patrol_base_data: any[]
+    monthly_collection_data: any[]
 }
 
-const Dashboard = ({ loan_data, members_data, members_loan_data, past_due_loans_data, collectibles_data }: Props) => {
+const Dashboard = ({ loan_data, members_data, members_loan_data, past_due_loans_data, collectibles_data, patrol_base_data, monthly_collection_data }: Props) => {
     const kpiData = [
         {
             title: 'Borrowed Amounts',
@@ -126,7 +124,7 @@ const Dashboard = ({ loan_data, members_data, members_loan_data, past_due_loans_
                         </CardHeader>
                         <CardContent className="pb-4">
                             <ResponsiveContainer width="100%" height={250}>
-                                <BarChart data={patrolBaseData}>
+                                <BarChart data={patrol_base_data}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                     <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} tick={{ fontSize: 11 }} />
                                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tick={{ fontSize: 11 }} />
@@ -142,7 +140,7 @@ const Dashboard = ({ loan_data, members_data, members_loan_data, past_due_loans_
                                 </BarChart>
                             </ResponsiveContainer>
                         </CardContent>
-                        {patrolBaseData.length === 0 && (
+                        {patrol_base_data.length === 0 && (
                             <div className="px-4 pb-4 sm:px-6 sm:pb-6">
                                 <p className="text-center text-sm text-muted-foreground">No data available</p>
                             </div>
@@ -159,7 +157,7 @@ const Dashboard = ({ loan_data, members_data, members_loan_data, past_due_loans_
                         </CardHeader>
                         <CardContent className="pb-4">
                             <ResponsiveContainer width="100%" height={250}>
-                                <LineChart data={monthlyCollectionData}>
+                                <LineChart data={monthly_collection_data}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                     <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={11} tick={{ fontSize: 11 }} />
                                     <YAxis
@@ -188,7 +186,7 @@ const Dashboard = ({ loan_data, members_data, members_loan_data, past_due_loans_
                                 </LineChart>
                             </ResponsiveContainer>
                         </CardContent>
-                        {monthlyCollectionData.length === 0 && (
+                        {monthly_collection_data.length === 0 && (
                             <div className="px-4 pb-4 sm:px-6 sm:pb-6">
                                 <p className="text-center text-sm text-muted-foreground">No data available</p>
                             </div>

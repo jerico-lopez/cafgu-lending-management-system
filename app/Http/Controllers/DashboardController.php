@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Loan;
 use App\Models\LoanSchedule;
 use App\Models\Member;
+use App\Models\PatrolBase;
+use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -89,6 +91,37 @@ class DashboardController extends Controller
 
         $total_collectible = $current_month_collectibles + $past_due_collectibles;
 
+        // ========================== Patrol Base Loans ============================
+        // Get all patrol bases
+        $patrol_bases = PatrolBase::all();
+
+        // Map each patrol base to total loans
+        $patrol_base_data = $patrol_bases->map(function ($base) {
+            $loan_count = Loan::where('patrol_base_id', $base->id)->count();
+            return [
+                'name' => $base->name,
+                'loans' => $loan_count,
+            ];
+        });
+
+        // ========================== Monthly Collection Data ============================
+        // Get sum of monthly payments grouped by month for the current year
+        $monthly_collection_data = LoanSchedule::join('loans', 'loan_schedules.loan_id', '=', 'loans.id')
+            ->select(
+                DB::raw('MONTH(loan_schedules.due_date) as month_number'),
+                DB::raw('SUM(loans.monthly_payment) as amount')
+            )
+            ->whereYear('loan_schedules.due_date', now()->year)
+            ->whereNull('loan_schedules.paid_at') // only unpaid collections
+            ->groupBy('month_number')
+            ->orderBy('month_number')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'month' => date('F', mktime(0, 0, 0, $item->month_number, 1)), // convert month number to name
+                    'amount' => $item->amount,
+                ];
+            });
 
         return Inertia::render('dashboard', [
             'loan_data' => [
@@ -109,7 +142,9 @@ class DashboardController extends Controller
                 'trend' => $members_loan_trend
             ],
             'past_due_loans_data' => ['value' => $past_due_loans],
-            'collectibles_data' => ['value' => $total_collectible]
+            'collectibles_data' => ['value' => $total_collectible],
+            'patrol_base_data' => $patrol_base_data,
+            'monthly_collection_data' => $monthly_collection_data
         ]);
     }
 }
