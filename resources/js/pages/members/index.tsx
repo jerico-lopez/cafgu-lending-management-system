@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Edit, Plus, Search, Trash2, Upload } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
@@ -429,7 +429,7 @@ const Members = ({ members }: Props) => {
                                                         <Edit className="mr-1 h-4 w-4" />
                                                         Edit
                                                     </Button>
-                                                    <Button variant="destructive" size="sm">
+                                                    <Button variant="destructive" size="sm" onClick={() => router.delete(`members/${member.id}`)}>
                                                         <Trash2 className="mr-1 h-4 w-4" />
                                                         Delete
                                                     </Button>

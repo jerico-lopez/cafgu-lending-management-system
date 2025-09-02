@@ -112,7 +112,7 @@ class MemberController extends Controller
         return redirect()->route('members.index');
     }
 
-    public function delete(Member $member)
+    public function destroy(Member $member)
     {
         $member->delete();
 
