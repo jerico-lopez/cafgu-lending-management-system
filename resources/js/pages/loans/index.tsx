@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Calculator, FileText, Plus, Search } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -73,10 +73,6 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
             net_amount,
             monthly_payment,
         });
-    };
-
-    const approveLoan = (loanId: number) => {
-        put(`/loans/${loanId}/approve`);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -349,7 +345,7 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
                                                         View Details
                                                     </Button>
                                                     {loan.status === 'Pending' && (
-                                                        <Button size="sm" className="btn-success" onClick={() => approveLoan(loan.id)}>
+                                                        <Button size="sm" className="btn-success" onClick={() => router.put(`/loans/${loan.id}/approve`)}>
                                                             Approve
                                                         </Button>
                                                     )}
