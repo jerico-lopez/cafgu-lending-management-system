@@ -13,10 +13,14 @@ class LoanController extends Controller
 {
     public function index()
     {
-        $loans = Loan::with('member', 'schedules')->latest()->get();
+        $members = Member::all();
+        $patrol_bases = PatrolBase::all();
+        $loans = Loan::with('member', 'schedules', 'patrolBase')->latest()->get();
 
         return Inertia::render('loans/index', [
-            'loans' => $loans
+            'loans' => $loans,
+            'members' => $members,
+            'patrol_bases' => $patrol_bases
         ]);
     }
 
@@ -33,25 +37,50 @@ class LoanController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'member_id' => 'required|exists:members,id',
             'patrol_base_id' => 'required|exists:patrol_bases,id',
             'principal_loan' => 'required|numeric|min:1000',
-            'previous_payment' => 'nullable|numeric|min:0',
-            'loan_term' => 'nullable|integer|min:1',
-            'interest_rate' => 'nullable|numeric|min:0',
-            'unpaid_share_capital_rate' => 'nullable|numeric|min:0',
-            'status' => 'nullable|string',
-            'share' => 'nullable|numeric|min:0',
+            'monthly_interest_rate' => 'required|numeric|min:0', // % per month
+            'loan_term' => 'required|integer|min:1',
             'zampen_benefits' => 'nullable|numeric|min:0',
+            'previous_payment' => 'nullable|numeric|min:0',
             'processing_fee' => 'nullable|numeric|min:0',
         ]);
 
-        Loan::create($request->all());
+        // Defaults for optional fields
+        $zampenBenefits = $data['zampen_benefits'] ?? 0;
+        $processingFee = $data['processing_fee'] ?? 0;
 
-        return redirect()->route('loans.index')
-            ->with('success', 'Loan created successfully with schedules.');
+        // Loan inputs
+        $principal = $data['principal_loan'];
+        $term = $data['loan_term'];
+        $interestRate = $data['monthly_interest_rate']; // percentage per month
+
+        $principalDeduction = $principal * 0.2 * $term;
+        $monthlyInterest = $principal * ($interestRate / 100) * $term;
+        $unpaidShareCapital = $principal * 0.02 * $term;
+
+        $totalDeductions = $principalDeduction + $monthlyInterest + $unpaidShareCapital + $zampenBenefits + $processingFee;
+
+        $netAmount = $principal - $totalDeductions;
+
+        $monthlyPayment = ($principal + $monthlyInterest) / $term;
+
+        $data = array_merge($data, [
+            'principal_deduction' => $principalDeduction,
+            'monthly_interest' => $monthlyInterest,
+            'unpaid_share_capital' => $unpaidShareCapital,
+            'total_deduction' => $totalDeductions,
+            'net_amount' => $netAmount,
+            'monthly_payment' => $monthlyPayment,
+        ]);
+
+        Loan::create($data);
+
+        return Inertia::location(route('loans.index'));
     }
+
 
     public function show(Loan $loan)
     {
@@ -64,16 +93,11 @@ class LoanController extends Controller
 
     public function approve(Loan $loan)
     {
-        if ($loan->status !== 'pending') {
+        if ($loan->status !== 'Pending') {
             return redirect()->back()->with('error', 'Only pending loans can be approved.');
         }
 
-        $loan->update(['status' => 'open']);
-
-        // Computations
-        $principalDeduction = $loan->principal_loan / $loan->loan_term;
-        $interest = $loan->principal_loan * ($loan->interest_rate / 100);
-        $shareCapital = $loan->principal_loan * ($loan->unpaid_share_capital_rate / 100);
+        $loan->update(['status' => 'Open']);
 
         // Generate loan schedules
         for ($month = 1; $month <= $loan->loan_term; $month++) {
@@ -81,10 +105,6 @@ class LoanController extends Controller
                 'loan_id' => $loan->id,
                 'month_no' => $month,
                 'due_date' => now()->addMonths($month),
-                'principal_deduction' => $principalDeduction,
-                'monthly_interest' => $interest,
-                'unpaid_share_capital' => $shareCapital,
-                'total_deduction' => $principalDeduction + $interest + $shareCapital,
             ]);
         }
     }

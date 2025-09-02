@@ -2,24 +2,31 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Loan extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
     protected $fillable = [
         'member_id',
         'patrol_base_id',
         'principal_loan',
-        'previous_payment',
+        'principal_deduction',
+        'monthly_interest_rate',
+        'monthly_interest',
         'loan_term',
-        'interest_rate',
-        'unpaid_share_capital_rate',
+        'unpaid_share_capital',
+        'previous_payment',
         'status',
         'share',
         'zampen_benefits',
         'processing_fee',
+        'total_deduction',
+        'net_amount',
+        'monthly_payment',
+        'date_approved'
     ];
 
     public function member()
@@ -32,8 +39,8 @@ class Loan extends Model
         return $this->belongsTo(PatrolBase::class);
     }
 
-    public function payments()
+    public function schedules()
     {
-        return $this->hasMany(Payment::class);
+        return $this->hasMany(LoanSchedule::class);
     }
 }

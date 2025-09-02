@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Loan;
 use App\Models\Member;
 use App\Models\PatrolBase;
 use App\Models\User;
@@ -29,5 +30,6 @@ class DatabaseSeeder extends Seeder
 
         Member::factory(10)->create();
         PatrolBase::factory(5)->create();
+        Loan::factory(2)->create();
     }
 }

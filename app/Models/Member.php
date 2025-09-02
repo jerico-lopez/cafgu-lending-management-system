@@ -31,11 +31,19 @@ class Member extends Model
         'afp_issued_id',
     ];
 
-    protected $appends = ['age'];
+    protected $appends = ['age', 'name'];
 
     public function getAgeAttribute()
     {
         return \Carbon\Carbon::parse($this->birth_date)->age;
+    }
+
+    public function getNameAttribute()
+    {
+        if ($this->middle_name) {
+            return "{$this->first_name} {$this->middle_name} {$this->last_name}";
+        }
+        return "{$this->first_name} {$this->last_name}";
     }
 
     public function attachments()

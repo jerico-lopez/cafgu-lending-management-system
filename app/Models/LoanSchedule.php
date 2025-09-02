@@ -13,20 +13,12 @@ class LoanSchedule extends Model
         'loan_id',
         'month_no',
         'due_date',
-        'principal_deduction',
-        'monthly_interest',
-        'unpaid_share_capital',
-        'total_deduction',
+        'paid_at'
     ];
 
     public function loan()
     {
         return $this->belongsTo(Loan::class);
-    }
-
-    public function payment()
-    {
-        return $this->hasMany(Payment::class);
     }
 
     public function isPaid()

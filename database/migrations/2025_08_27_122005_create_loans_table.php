@@ -15,14 +15,20 @@ return new class extends Migration {
             $table->foreignId('member_id')->constrained()->onDelete('cascade');
             $table->foreignId('patrol_base_id')->constrained()->onDelete('cascade');
             $table->decimal('principal_loan', 12, 2); // The loan amount
+            $table->decimal('principal_deduction', 12, 2)->nullable();
+            $table->decimal('monthly_interest_rate', 12, 2);
+            $table->decimal('monthly_interest', 12, 2);
+            $table->integer('loan_term');
+            $table->decimal('unpaid_share_capital', 12, 2);
             $table->decimal('previous_payment', 12, 2)->default(0);
-            $table->unsignedInteger('loan_term')->default(5); // Loan term in months
-            $table->decimal('interest_rate', 5, 2)->default(3.00); // Interest rate
-            $table->decimal('unpaid_share_capital_rate', 5, 2)->default(2.00); // Share capital rate
-            $table->enum('status', ['pending', 'open', 'rejected'])->default('pending'); // Loan Status
+            $table->enum('status', ['Pending', 'Open', 'Rejected'])->default('Pending'); // Loan Status
             $table->decimal('share', 12, 2)->nullable(); // Accumulated unpaid share capital
             $table->decimal('zampen_benefits', 12, 2)->nullable();
             $table->decimal('processing_fee', 12, 2)->nullable();
+            $table->decimal('total_deduction', 12, 2)->nullable();
+            $table->decimal('net_amount', 12, 2)->nullable();
+            $table->decimal('monthly_payment', 12, 2)->nullable();
+            $table->date('date_approved')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

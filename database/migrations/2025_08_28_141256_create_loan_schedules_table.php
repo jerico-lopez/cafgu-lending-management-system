@@ -16,10 +16,7 @@ return new class extends Migration
             $table->foreignId('loan_id')->constrained()->onDelete('cascade');
             $table->unsignedInteger('month_no');
             $table->date('due_date');
-            $table->decimal('principal_deduction', 12, 2)->nullable(); // 20% of principal loan
-            $table->decimal('monthly_interest', 12, 2)->nullable(); // 3% of principal loan
-            $table->decimal('unpaid_share_capital', 12, 2)->nullable(); // 2% of principal loan
-            $table->decimal('total_deduction', 12, 2)->nullable();
+            $table->date('paid_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
