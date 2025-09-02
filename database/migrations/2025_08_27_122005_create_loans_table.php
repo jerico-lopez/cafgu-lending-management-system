@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->integer('loan_term');
             $table->decimal('unpaid_share_capital', 12, 2);
             $table->decimal('previous_payment', 12, 2)->default(0);
-            $table->enum('status', ['Pending', 'Open', 'Rejected'])->default('Pending'); // Loan Status
+            $table->enum('status', ['Pending', 'Open', 'Rejected', 'Paid'])->default('Pending'); // Loan Status
             $table->decimal('share', 12, 2)->nullable(); // Accumulated unpaid share capital
             $table->decimal('zampen_benefits', 12, 2)->nullable();
             $table->decimal('processing_fee', 12, 2)->nullable();
