@@ -50,26 +50,32 @@ class MemberController extends Controller
 
         $member = Member::create($validated_data);
 
-        $request->validate([
-            'attachments.*' => 'file|max:2048',
-            'attachment_names.*' => 'string|max:255'
-        ]);
+        // Validate attachments if they exist
+        if ($request->hasFile('attachments')) {
+            $request->validate([
+                'attachments.*' => 'file|max:5120',
+            ]);
 
-        $attachments = $request->file('attachments');
-        $names = $request->input('attachment_names');
+            foreach ($request->file('attachments') as $index => $file) {
+                if ($file && $file->isValid()) {
+                    // Get the custom file name from the request
+                    $file_name = $request->input("attachments.{$index}.file_name")
+                        ?? $file->getClientOriginalName();
 
-        if ($attachments) {
-            foreach ($attachments as $index => $file) {
-                $file_name = $names[$index] ?? $file->getClientOriginalName(); // Title of the attachment
+                    // Generate a unique filename with the original extension
+                    $unique_name = Str::uuid() . '.' . $file->getClientOriginalExtension();
 
-                $unique_name = Str::uuid() . '_' . $file->getClientOriginalExtension(); // Unique name for the attachment path
-                $path = $file->storeAs('attachments', $unique_name, 'public'); // Store the attachment
+                    // Store the file
+                    $path = $file->storeAs('attachments', $unique_name, 'public');
 
-                // Create the attachment record
-                $member->attachments()->create([
-                    'file_name' => $file_name,
-                    'file_path' => $path
-                ]);
+                    // Create the attachment record
+                    $member->attachments()->create([
+                        'file_name' => $file_name,
+                        'file_path' => $path,
+                        'mime_type' => $file->getMimeType(),
+                        'size' => $file->getSize(),
+                    ]);
+                }
             }
         }
 

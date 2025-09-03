@@ -11,7 +11,9 @@ class Attachment extends Model
     protected $fillable =[
         "user_id",
         "file_name",
-        "file_path"
+        "file_path",
+        "mime_type",
+        "size"
     ];
 
     public function member()

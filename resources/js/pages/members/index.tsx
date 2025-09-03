@@ -8,8 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { router, useForm } from '@inertiajs/react';
-import { Edit, Plus, Search, Trash2, Upload } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { Edit, File, Plus, Search, Trash2, Upload, X } from 'lucide-react';
+import React, { useState } from 'react';
 
 const religionOptions = ['Catholic', 'Protestant', 'Islam', 'Buddhism', 'Others'];
 const genderOptions = ['Male', 'Female'];
@@ -20,11 +20,18 @@ interface Props {
     members: any[];
 }
 
+interface AttachmentWithName {
+    file: File;
+    file_name: string;
+}
+
 const Members = ({ members }: Props) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
 
-    const { data, setData, post, processing, errors } = useForm({
+    const [previewUrls, setPreviewUrls] = useState<(string | null)[]>([]);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
         last_name: '',
         first_name: '',
         middle_name: '',
@@ -44,6 +51,7 @@ const Members = ({ members }: Props) => {
         initial_capital_subscription: '',
         initial_paid_up: '',
         afp_issued_id: '',
+        attachments: [] as AttachmentWithName[],
     });
 
     const { toast } = useToast();
@@ -67,20 +75,124 @@ const Members = ({ members }: Props) => {
         }
     };
 
+    // Handle File Change
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = Array.from(e.target.files ?? []);
+        const newAttachments = selectedFiles.map((file) => ({
+            file,
+            file_name: file.name,
+        }));
+        const updatedFiles = [...data.attachments, ...newAttachments];
+        setData('attachments', updatedFiles);
+
+        // Preview File
+        previewFiles(updatedFiles);
+    };
+
+    // Handle File Drop
+    const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        const selectedFiles = Array.from(e.dataTransfer.files ?? []);
+        const newAttachments = selectedFiles.map((file) => ({
+            file,
+            file_name: file.name,
+        }));
+        const updatedFiles = [...data.attachments, ...newAttachments];
+        setData('attachments', updatedFiles);
+
+        // Preview File
+        previewFiles(updatedFiles);
+    };
+
+    const previewFiles = (attachments: AttachmentWithName[]) => {
+        const previews: string[] = [];
+
+        attachments.forEach((attachment, index) => {
+            if (attachment.file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                    previews[index] = reader.result as string;
+
+                    if (previews.length === attachments.length) {
+                        setPreviewUrls([...previews]);
+                    }
+                };
+
+                reader.readAsDataURL(attachment.file);
+            } else {
+                previews[index] = '';
+                if (previews.length === attachments.length) {
+                    setPreviewUrls([...previews]);
+                }
+            }
+
+            setPreviewUrls(previews);
+        });
+    };
+
+    const handleFileRemove = (index: number) => {
+        const updatedFiles = [...data.attachments];
+        const updatedPreview = [...previewUrls];
+
+        updatedFiles.splice(index, 1);
+        updatedPreview.splice(index, 1);
+
+        setData('attachments', updatedFiles);
+        setPreviewUrls(updatedPreview);
+    };
+
+    const handleFileNameChange = (index: number, name: string) => {
+        const updatedFiles = [...data.attachments];
+        updatedFiles[index] = {
+            ...updatedFiles[index],
+            file_name: name,
+        };
+        setData('attachments', updatedFiles);
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('members', {
+
+        const formData = new FormData();
+
+        // Append text input
+        Object.keys(data).forEach((key) => {
+            if (key !== 'attachments') {
+                formData.append(key, (data as any)[key] ?? '');
+            }
+        });
+
+        // Append files
+        data.attachments.forEach((attachment, index) => {
+            formData.append(`attachments[${index}]`, attachment.file);
+            formData.append(`attachments[${index}][file_name]`, attachment.file_name);
+        });
+
+        router.post('members', formData, {
+            forceFormData: true, // important so Inertia treats it as multipart/form-data
             onError: (errors) => {
                 Object.entries(errors).forEach(([field, messages]) => {
-                    // Ensure messages is always an array
                     const msgArray = Array.isArray(messages) ? messages : [messages];
-
                     msgArray.forEach((msg, index) => {
                         toast({ title: `${msg}`, duration: 5000, variant: 'destructive', key: `${index}` });
                     });
                 });
-            }
+            },
         });
+
+        //     post('members', {
+        //         onError: (errors) => {
+        //             Object.entries(errors).forEach(([field, messages]) => {
+        //                 // Ensure messages is always an array
+        //                 const msgArray = Array.isArray(messages) ? messages : [messages];
+
+        //                 msgArray.forEach((msg, index) => {
+        //                     toast({ title: `${msg}`, duration: 5000, variant: 'destructive', key: `${index}` });
+        //                 });
+        //             });
+        //         },
+        //     });
     };
 
     return (
@@ -328,7 +440,9 @@ const Members = ({ members }: Props) => {
                                                 onChange={(e) => handleInputChange('initial_capital_subscription', e.target.value)}
                                                 placeholder="₱"
                                             />
-                                            {errors.initial_capital_subscription && <p style={{ color: 'red' }}>{errors.initial_capital_subscription}</p>}
+                                            {errors.initial_capital_subscription && (
+                                                <p style={{ color: 'red' }}>{errors.initial_capital_subscription}</p>
+                                            )}
                                         </div>
 
                                         <div className="space-y-2">
@@ -358,13 +472,86 @@ const Members = ({ members }: Props) => {
                                 {/* Attachments */}
                                 <div>
                                     <h3 className="mb-4 text-lg font-semibold">Attachments</h3>
-                                    <div className="rounded-lg border-2 border-dashed border-border p-6 text-center">
-                                        <Upload className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                                        <p className="mb-2 text-muted-foreground">Upload member documents</p>
-                                        <Button variant="outline" type="button">
-                                            Browse Files
-                                        </Button>
-                                    </div>
+                                    <label
+                                        onDragOver={(e) => {
+                                            e.preventDefault();
+                                        }}
+                                        onDrop={handleFileDrop}
+                                        htmlFor="dropzone"
+                                        className="flex h-70 w-full flex-col items-center justify-center gap-3 rounded-md border border-dashed border-input bg-background transition hover:bg-gray-100"
+                                    >
+                                        <input onChange={handleFileChange} type="file" id="dropzone" multiple className="hidden" />
+                                        <Upload className="h-16 w-16 text-gray-500" />
+                                        <p className="text-gray-500">Click to browse files or drag and drop to upload</p>
+                                        <p className="text-sm text-gray-500">Any file type (max 5MB each)</p>
+                                    </label>
+
+                                    {/* File Preview for Images */}
+                                    {previewUrls.some((url) => url) && (
+                                        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            {data.attachments.map((attachment, index) =>
+                                                previewUrls[index] ? (
+                                                    <div
+                                                        key={index}
+                                                        className="relative flex items-center gap-3 rounded-md border border-gray-300 bg-white p-2 shadow-md"
+                                                    >
+                                                        {/* Preview Image */}
+                                                        <img
+                                                            src={previewUrls[index] as string}
+                                                            alt={`preview-${index}`}
+                                                            className="h-32 w-32 rounded-md object-cover"
+                                                        />
+
+                                                        <div className="flex w-full flex-col gap-1">
+                                                            <Label htmlFor={`file_name_${index}`}>File Name</Label>
+                                                            <Input
+                                                                id={`file_name_${index}`}
+                                                                value={attachment.file_name}
+                                                                onChange={(e) => handleFileNameChange(index, e.target.value)}
+                                                            />
+                                                        </div>
+
+                                                        {/* Remove Button */}
+                                                        <button
+                                                            onClick={() => handleFileRemove(index)}
+                                                            type="button"
+                                                            className="absolute top-1 right-1 flex cursor-pointer flex-row items-center gap-2 rounded-md border border-red-500 p-2 text-red-500 hover:bg-red-500 hover:text-white"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : null,
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* For  Non Images */}
+                                    {data.attachments.some((_, index) => !previewUrls[index]) && (
+                                        <div className="grid-col-1 mt-3 grid gap-2">
+                                            {data.attachments.map((attachment, index) =>
+                                                !previewUrls[index] ? (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center justify-between rounded-md border border-gray-300 bg-white p-2 shadow-md"
+                                                    >
+                                                        <div className="flex flex-col gap-2">
+                                                            <File />
+                                                            <span>{attachment.file.name}</span>
+                                                        </div>
+
+                                                        {/* Remove Button */}
+                                                        <button
+                                                            onClick={() => handleFileRemove(index)}
+                                                            type="button"
+                                                            className="flex cursor-pointer flex-row items-center gap-2 rounded-md border border-red-500 p-2 text-red-500 hover:bg-red-500 hover:text-white"
+                                                        >
+                                                            <X className="h-4 w-4" /> Remove
+                                                        </button>
+                                                    </div>
+                                                ) : null,
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex gap-4">
