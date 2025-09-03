@@ -58,9 +58,22 @@ class MemberController extends Controller
 
             foreach ($request->file('attachments') as $index => $file) {
                 if ($file && $file->isValid()) {
-                    // Get the custom file name from the request
-                    $file_name = $request->input("attachments.{$index}.file_name")
+                    // get file name
+                    $originalName = $request->input("attachments.{$index}.file_name")
                         ?? $file->getClientOriginalName();
+
+                    $extension = $file->getClientOriginalExtension();
+                    $maxLength = 50;
+
+                    // reserve space for the dot + extension
+                    $baseLength = $maxLength - (strlen($extension) + 1);
+
+                    // cut the base name safely
+                    $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+                    $baseName = Str::limit($baseName, $baseLength, '');
+
+                    // put it back together
+                    $file_name = $baseName . '.' . $extension;
 
                     // Generate a unique filename with the original extension
                     $unique_name = Str::uuid() . '.' . $file->getClientOriginalExtension();
