@@ -40,7 +40,7 @@ class PaymentController extends Controller
             return back()->withErrors(['loan_id' => 'Payments can only be made on open loans.'])->withInput();
         }
 
-        Payment::create($request->all());
+        LoanSchedule::create($request->all());
 
         return back()->with('success', 'Payment recorded.');
     }

@@ -41,10 +41,8 @@ class LoanController extends Controller
             'member_id' => 'required|exists:members,id',
             'patrol_base_id' => 'required|exists:patrol_bases,id',
             'principal_loan' => 'required|numeric|min:1000',
-            'monthly_interest_rate' => 'required|numeric|min:0', // % per month
-            'loan_term' => 'required|integer|min:1',
-            'zampen_benefits' => 'nullable|numeric|min:0',
             'previous_payment' => 'nullable|numeric|min:0',
+            'zampen_benefits' => 'nullable|numeric|min:0',
             'processing_fee' => 'nullable|numeric|min:0',
         ]);
 
@@ -54,25 +52,20 @@ class LoanController extends Controller
 
         // Loan inputs
         $principal = $data['principal_loan'];
-        $term = $data['loan_term'];
-        $interestRate = $data['monthly_interest_rate']; // percentage per month
 
-        $principalDeduction = $principal * 0.2 * $term;
-        $monthlyInterest = $principal * ($interestRate / 100) * $term;
-        $unpaidShareCapital = $principal * 0.02 * $term;
+        $principalDeduction = $principal / 5; //divide by 5 terms
+        $monthlyInterest = $principal * 0.03; // 3% of loan
+        $unpaidShareCapital = $principal * 0.02; // 2% of loan
 
         $totalDeductions = $principalDeduction + $monthlyInterest + $unpaidShareCapital + $zampenBenefits + $processingFee;
 
-        $netAmount = $principal - $totalDeductions;
-
-        $monthlyPayment = ($principal + $monthlyInterest) / $term;
+        $monthlyPayment = $principalDeduction + $monthlyInterest + $unpaidShareCapital;
 
         $data = array_merge($data, [
             'principal_deduction' => $principalDeduction,
             'monthly_interest' => $monthlyInterest,
             'unpaid_share_capital' => $unpaidShareCapital,
             'total_deduction' => $totalDeductions,
-            'net_amount' => $netAmount,
             'monthly_payment' => $monthlyPayment,
         ]);
 

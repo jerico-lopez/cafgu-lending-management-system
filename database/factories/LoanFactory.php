@@ -18,35 +18,36 @@ class LoanFactory extends Factory
      */
     public function definition(): array
     {
-        $member_id = Member::inRandomOrder()->first()->id;
-        $patrol_base_id = PatrolBase::inRandomOrder()->first()->id;
-        $monthly_interest_rate = 0.03;
-        $term = $this->faker->randomElement([1, 2, 3, 6, 12]);
-        $zampenBenefits = $this->faker->numberBetween(1000, 5000);
-        $processingFee = $this->faker->numberBetween(200, 800);
+        $principalLoan = $this->faker->numberBetween(5000, 100000); // base loan
+        $previousPayment = $this->faker->numberBetween(0, $principalLoan / 2);
 
-        $principal_loan = $this->faker->numberBetween(1000, 10000);
-        $principal_deduction = $principal_loan * 0.2 * $term;
-        $monthly_interest = $principal_loan * $monthly_interest_rate * $term;
-        $unpaid_share_capital = $principal_loan * 0.02 * $term;
+        $principalDeduction = $principalLoan / 5; // principal loan divided by fixed 5 loan terms
+        $monthlyInterest = $principalLoan * 0.03; //fixed 3% interest
+        $unpaidShareCapital = $principalLoan * 0.02; //fixed 2%
 
-        $total_deductions = $principal_deduction + $monthly_interest + $unpaid_share_capital + $zampenBenefits + $processingFee;
+        $processingFee = 100;
+        $zampenBenefits = 100;
+
+        $totalDeduction = $principalDeduction + $monthlyInterest + $unpaidShareCapital + $zampenBenefits + $processingFee;
+        $balance = $this->faker->numberBetween(0, 2000);
+        $share = $unpaidShareCapital;
+        $monthly_payment =  $principalDeduction + $monthlyInterest + $unpaidShareCapital;
 
         return [
-            'member_id' => $member_id,
-            'patrol_base_id' => $patrol_base_id,
-            'principal_loan' => $principal_loan,
-            'principal_deduction' => $principal_deduction,
-            'monthly_interest_rate' => $monthly_interest_rate,
-            'monthly_interest' => $monthly_interest,
-            'loan_term' => $term,
-            'unpaid_share_capital' => $unpaid_share_capital,
-            'share' => $this->faker->numberBetween(1000, 5000),
+            'member_id' => Member::inRandomOrder()->first()->id ?? Member::factory(),
+            'patrol_base_id' => PatrolBase::inRandomOrder()->first()->id ?? PatrolBase::factory(),
+            'principal_loan' => $principalLoan,
+            'previous_payment' => $previousPayment,
+            'principal_deduction' => $principalDeduction,
+            'monthly_interest' => $monthlyInterest,
+            'unpaid_share_capital' => $unpaidShareCapital,
+            'balance' => $balance,
+            'share' => $share,
             'zampen_benefits' => $zampenBenefits,
             'processing_fee' => $processingFee,
-            'total_deduction' => $total_deductions,
-            'net_amount' => $principal_loan - $total_deductions,
-            'monthly_payment' => ($principal_loan + $monthly_interest) / $term,
+            'total_deduction' => $totalDeduction,
+            'status' => 'Pending',
+            'monthly_payment' => $monthly_payment
         ];
     }
 }
