@@ -15,7 +15,7 @@ class DashboardController extends Controller
     public function index()
     {
         // ========================== Loan Data ===============================
-        $total_loans = Loan::sum('principal_loan');
+        $total_loans = Loan::where('status', '=', 'Open')->sum('principal_loan');
 
         $new_loans = Loan::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
@@ -73,9 +73,6 @@ class DashboardController extends Controller
             $members_loan_change = "No updates";
             $members_loan_trend = "flat";
         }
-
-        // ========================== Past Due Data ============================
-        $past_due_loans = LoanSchedule::where('paid_at', null)->whereDate('due_date', '<', now())->count();
 
         // ========================== Collectible Data ============================
         $current_month_collectibles = LoanSchedule::join('loans', 'loan_schedules.loan_id', '=', 'loans.id')
@@ -141,7 +138,6 @@ class DashboardController extends Controller
                 'change' => $members_loan_change,
                 'trend' => $members_loan_trend
             ],
-            'past_due_loans_data' => ['value' => $past_due_loans],
             'collectibles_data' => ['value' => $total_collectible],
             'patrol_base_data' => $patrol_base_data,
             'monthly_collection_data' => $monthly_collection_data

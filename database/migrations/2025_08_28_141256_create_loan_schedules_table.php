@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('loan_id')->constrained()->onDelete('cascade');
             $table->unsignedInteger('month_no');
+            $table->decimal('amount', 12, 2);
             $table->date('due_date');
             $table->date('paid_at')->nullable();
             $table->softDeletes();

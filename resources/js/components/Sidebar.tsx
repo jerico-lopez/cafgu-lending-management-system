@@ -13,7 +13,6 @@ interface NavItem {
 }
 
 const navigation: NavItem[] = [
-    { title: 'Analytics', href: '/analytics', icon: BarChart3 },
     { title: 'Dashboard', href: '/dashboard', icon: Home },
     { title: 'MANAGE', href: '', icon: Menu, isHeader: true },
     { title: 'Borrowers', href: '/borrowers', icon: UserPlus },

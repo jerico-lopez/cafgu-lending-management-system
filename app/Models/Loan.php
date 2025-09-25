@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,9 +15,7 @@ class Loan extends Model
         'patrol_base_id',
         'principal_loan',
         'principal_deduction',
-        'monthly_interest_rate',
         'monthly_interest',
-        'loan_term',
         'unpaid_share_capital',
         'previous_payment',
         'status',
@@ -24,10 +23,11 @@ class Loan extends Model
         'zampen_benefits',
         'processing_fee',
         'total_deduction',
-        'net_amount',
         'monthly_payment',
         'date_approved'
     ];
+
+    protected $appends = ['total_collectibles', 'collectibles_this_month'];
 
     public function member()
     {
@@ -42,5 +42,23 @@ class Loan extends Model
     public function schedules()
     {
         return $this->hasMany(LoanSchedule::class);
+    }
+
+    protected function totalCollectibles(): Attribute
+    {
+        return Attribute::get(fn () =>
+            $this->schedules()->whereNull('paid_at')->sum('amount')
+        );
+    }
+
+    protected function collectiblesThisMonth(): Attribute
+    {
+        return Attribute::get(fn () =>
+            $this->schedules()
+                ->whereNull('paid_at')
+                ->whereMonth('due_date', now()->month)
+                ->whereYear('due_date', now()->year)
+                ->sum('amount')
+        );
     }
 }

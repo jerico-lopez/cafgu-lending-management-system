@@ -20,6 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::controller(LoanController::class)->group(function () {
             Route::put('/loans/{loan}/approve', 'approve')->name('loans.approve');
+            Route::put('/loans/{loan}/schedules/{schedule}/pay', 'pay')->name('loans.pay');
         });
 
         Route::controller(PaymentController::class)->group(function () {

@@ -15,8 +15,8 @@ return new class extends Migration {
             $table->foreignId('member_id')->constrained()->onDelete('cascade');
             $table->foreignId('patrol_base_id')->constrained()->onDelete('cascade');
             $table->decimal('principal_loan', 12, 2); // The loan amount
-            $table->decimal('previous_payment', 12, 2)->default(0);
-            $table->decimal('principal_deduction', 12, 2)->nullable();
+            $table->decimal('previous_payment', 12, 2)->nullable();
+            $table->decimal('principal_deduction', 12, 2);
             $table->decimal('monthly_interest', 12, 2);
             $table->decimal('unpaid_share_capital', 12, 2);
             $table->decimal('balance', 12, 2)->nullable();

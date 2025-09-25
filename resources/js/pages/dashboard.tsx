@@ -21,10 +21,6 @@ interface MembersLoanData {
     trend: string;
 }
 
-interface PastDueLoansData{
-    value: number;
-}
-
 interface CollectiblesData{
     value: number;
 }
@@ -33,13 +29,12 @@ interface Props {
     loan_data: LoanData;
     members_data: MembersData;
     members_loan_data: MembersLoanData;
-    past_due_loans_data: PastDueLoansData;
     collectibles_data: CollectiblesData;
     patrol_base_data: any[]
     monthly_collection_data: any[]
 }
 
-const Dashboard = ({ loan_data, members_data, members_loan_data, past_due_loans_data, collectibles_data, patrol_base_data, monthly_collection_data }: Props) => {
+const Dashboard = ({ loan_data, members_data, members_loan_data, collectibles_data, patrol_base_data, monthly_collection_data }: Props) => {
     const kpiData = [
         {
             title: 'Borrowed Amounts',
@@ -61,11 +56,6 @@ const Dashboard = ({ loan_data, members_data, members_loan_data, past_due_loans_
             change: members_loan_data.change,
             icon: CreditCard,
             trend: members_loan_data.trend,
-        },
-        {
-            title: 'Past Due Loans',
-            value: past_due_loans_data.value,
-            icon: AlertCircle,
         },
         {
             title: 'Collectible this Month',

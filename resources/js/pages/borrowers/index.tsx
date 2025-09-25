@@ -10,17 +10,19 @@ import { useToast } from '@/hooks/use-toast';
 import { Eye, Plus, Search } from 'lucide-react';
 import React, { useState } from 'react';
 
-interface Props{
-    members: any[]
-    loans: any[]
-    patrol_bases: any[]
+interface Props {
+    members: any[];
+    loans: any[];
+    patrol_bases: any[];
+    collectibleThisMonth: number;
 }
 
-const Borrowers: React.FC<Props> = ({ members, loans, patrol_bases }) => {
+const Borrowers: React.FC<Props> = ({ members, loans, patrol_bases, collectibleThisMonth }) => {
     const [selectedMember, setSelectedMember] = useState('');
     const [selectedPatrolBase, setSelectedPatrolBase] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const { toast } = useToast();
+    const monthName = new Date().toLocaleString('en-US', { month: 'long' });
 
     const filteredMembers = members.filter(
         (member) => member.name.toLowerCase().includes(searchTerm.toLowerCase()) || member.tin_number.includes(searchTerm),
@@ -59,7 +61,9 @@ const Borrowers: React.FC<Props> = ({ members, loans, patrol_bases }) => {
             <div className="page-container">
                 <div className="page-header">
                     <h1 className="page-title">Borrowers Management</h1>
-                    <div className="text-sm text-muted-foreground">₱0.00 Collectibles this month (August)</div>
+                    <div className="text-sm text-muted-foreground">
+                        {collectibleThisMonth ? `₱${collectibleThisMonth.toLocaleString()}` : '₱0.00'} Collectibles this month ({monthName})
+                    </div>
                 </div>
 
                 {/* New Borrower Form */}

@@ -49,8 +49,14 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'totalCollectible'=> $isAdmin ? LoanSchedule::whereMonth('created_at', now()->month)->sum('total_deduction') : null,
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'totalCollectible' => $isAdmin
+                ? LoanSchedule::whereNull('paid_at')
+                    ->whereMonth('due_date', now()->month)
+                    ->whereYear('due_date', now()->year)
+                    ->sum('amount')
+                : null,
+
             'collectibleLoans' => $isAdmin ? LoanSchedule::whereMonth('created_at', now()->month)->get() : null,
         ];
     }

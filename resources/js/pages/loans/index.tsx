@@ -24,17 +24,17 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
         member_id: '',
         patrol_base_id: '',
         principal_loan: '',
-        monthly_interest_rate: '3',
-        loan_term: '2',
-        zampen_benefits: '1000',
-        processing_fee: '500',
+        previous_payment:'',
+        balance: '',
+        share: '',
+        zampen_benefits: '100',
+        processing_fee: '100',
     });
     const [calculations, setCalculations] = useState({
         principal_deduction: 0,
         monthly_interest: 0,
         unpaid_share_capital: 0,
         total_deductions: 0,
-        net_amount: 0,
         monthly_payment: 0,
     });
     const { toast } = useToast();
@@ -53,24 +53,20 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
 
     const calculateLoan = (form: typeof data) => {
         const principal_loan = parseFloat(form.principal_loan) || 0;
-        const loan_term = parseInt(form.loan_term) || 2;
-        const monthly_interest_rate = parseFloat(form.monthly_interest_rate) || 3;
         const zampen_benefits = parseFloat(form.zampen_benefits) || 1000;
         const processing_fee = parseFloat(form.processing_fee) || 500;
 
-        const principal_deduction = principal_loan * 0.2 * loan_term;
-        const monthly_interest = principal_loan * (monthly_interest_rate / 100) * loan_term;
-        const unpaid_share_capital = principal_loan * 0.02 * loan_term;
+        const principal_deduction = principal_loan  * 0.2;
+        const monthly_interest = principal_loan * 0.03;
+        const unpaid_share_capital = principal_loan * 0.02; 
         const total_deductions = principal_deduction + monthly_interest + unpaid_share_capital + zampen_benefits + processing_fee;
-        const net_amount = principal_loan - total_deductions;
-        const monthly_payment = (principal_loan + monthly_interest) / loan_term;
+        const monthly_payment = principal_loan / 5;
 
         setCalculations({
             principal_deduction,
             monthly_interest,
             unpaid_share_capital,
             total_deductions,
-            net_amount,
             monthly_payment,
         });
     };
@@ -175,30 +171,36 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="monthly_interest_rate">Monthly Interest Rate (%)</Label>
+                                            <Label htmlFor="previous_payment">Previous Payment</Label>
                                             <Input
-                                                id="monthly_interest_rate"
+                                                id="previous_payment"
                                                 type="number"
-                                                step="0.1"
-                                                value={data.monthly_interest_rate}
-                                                onChange={(e) => handleInputChange('monthly_interest_rate', e.target.value)}
+                                                value={data.previous_payment}
+                                                onChange={(e) => handleInputChange('previous_payment', e.target.value)}
+                                                placeholder="₱0.00"
                                             />
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="loan_term">Loan Term (Months)</Label>
-                                            <Select value={data.loan_term} onValueChange={(value) => handleInputChange('loan_term', value)}>
-                                                <SelectTrigger>
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="1">1 Month</SelectItem>
-                                                    <SelectItem value="2">2 Months</SelectItem>
-                                                    <SelectItem value="3">3 Months</SelectItem>
-                                                    <SelectItem value="6">6 Months</SelectItem>
-                                                    <SelectItem value="12">12 Months</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                            <Label htmlFor="balance">Balance</Label>
+                                            <Input
+                                                id="balance"
+                                                type="number"
+                                                value={data.balance}
+                                                onChange={(e) => handleInputChange('balance', e.target.value)}
+                                                placeholder="₱0.00"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="share">Share</Label>
+                                            <Input
+                                                id="share"
+                                                type="number"
+                                                value={data.share}
+                                                onChange={(e) => handleInputChange('share', e.target.value)}
+                                                placeholder="₱0.00"
+                                            />
                                         </div>
 
                                         <div className="space-y-2">
@@ -243,29 +245,12 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
                                                     <span className="text-sm font-medium">Unpaid Share Capital (2%/month):</span>
                                                     <span className="font-mono">₱{calculations.unpaid_share_capital.toLocaleString()}</span>
                                                 </div>
-
-                                                <div className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
-                                                    <span className="text-sm font-medium">Zampen Benefits:</span>
-                                                    <span className="font-mono">₱{parseFloat(data.zampen_benefits || '0').toLocaleString()}</span>
-                                                </div>
-
-                                                <div className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
-                                                    <span className="text-sm font-medium">Processing Fee:</span>
-                                                    <span className="font-mono">₱{parseFloat(data.processing_fee || '0').toLocaleString()}</span>
-                                                </div>
                                             </div>
 
                                             <div className="space-y-3">
                                                 <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-3">
                                                     <span className="text-sm font-medium">Total Deductions:</span>
                                                     <span className="font-mono font-bold">₱{calculations.total_deductions.toLocaleString()}</span>
-                                                </div>
-
-                                                <div className="flex items-center justify-between rounded-lg border border-success/20 bg-success/5 p-3">
-                                                    <span className="text-sm font-medium">Net Amount to Receive:</span>
-                                                    <span className="font-mono font-bold text-success">
-                                                        ₱{calculations.net_amount.toLocaleString()}
-                                                    </span>
                                                 </div>
 
                                                 <div className="flex items-center justify-between rounded-lg border border-warning/20 bg-warning/5 p-3">
@@ -286,12 +271,6 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
                                     <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                                         Cancel
                                     </Button>
-                                    {data.principal_loan && (
-                                        <Button type="button" variant="outline">
-                                            <FileText className="mr-2 h-4 w-4" />
-                                            Generate Amortization Schedule
-                                        </Button>
-                                    )}
                                 </div>
                             </form>
                         </CardContent>
@@ -341,7 +320,7 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
                                             <TableCell>{loan.date_approved || 'Pending'}</TableCell>
                                             <TableCell>
                                                 <div className="flex gap-2">
-                                                    <Button variant="outline" size="sm">
+                                                    <Button variant="outline" size="sm" onClick={() => router.visit(`/loans/${loan.id}`)}>
                                                         View Details
                                                     </Button>
                                                     {loan.status === 'Pending' && (
