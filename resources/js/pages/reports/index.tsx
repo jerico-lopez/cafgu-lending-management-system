@@ -112,8 +112,8 @@ const ReportView = ({ reportData, patrolBases, filters }: Props) => {
 
                 {/* Report Table */}
                 <div className="overflow-x-auto">
-                    <table className="min-w-full border border-gray-300 text-sm">
-                        <thead className="bg-gray-100">
+                    <table className="min-w-full borde text-sm">
+                        <thead>
                             <tr>
                                 <th className="border px-2 py-1 text-center">No</th>
                                 <th className="border px-2 py-1 text-center">Patrol Base</th>
@@ -153,7 +153,7 @@ const ReportView = ({ reportData, patrolBases, filters }: Props) => {
                             })}
 
                             {/* Totals Row */}
-                            <tr className="bg-gray-200 font-bold">
+                            <tr className="font-bold">
                                 <td colSpan={3} className="border px-2 py-1 text-center">
                                     TOTAL
                                 </td>
