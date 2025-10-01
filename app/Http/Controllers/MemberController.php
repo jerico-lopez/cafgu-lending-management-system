@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attachment;
 use App\Models\Member;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -20,7 +22,7 @@ class MemberController extends Controller
     public function show(Member $member)
     {
         return Inertia::render('members/show', [
-            'member' => $member
+            'member' => $member->load('attachments')
         ]);
     }
 
@@ -109,26 +111,26 @@ class MemberController extends Controller
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'address' => 'required|string|max:255',
-            'tin_number' => 'required|string|max:255|unique:members,tin_number,' . $member->id,
+            'tin_number' => 'nullable|string|max:255|unique:members,tin_number,' . $member->id,
             'birth_date' => 'required|date',
-            'gender_id' => 'required|exists:genders,id',
-            'civil_status_id' => 'required|exists:civil_statuses,id',
-            'educational_attainment' => 'required|string|max:255',
-            'occupation' => 'required|string|max:255',
-            'number_of_dependents' => 'required|integer|min:0',
-            'religion_id' => 'required|exists:religions,id',
-            'annual_income' => 'required|numeric|min:0',
-            'membership_number' => 'required|string|max:255',
-            'bod_relationship' => 'required|string|max:255',
-            'membership_type' => 'required|string|max:255',
-            'initial_capital_subscription' => 'required|numeric|min:0',
-            'initial_paid_up' => 'required|numeric|min:0',
-            'afp_id_issued' => 'required|string|max:255',
+            'gender' => 'required',
+            'civil_status' => 'required',
+            'educational_attainment' => 'nullable|string|max:255',
+            'occupation' => 'nullable|string|max:255',
+            'number_of_dependents' => 'nullable|integer|min:0',
+            'religion' => 'nullable',
+            'annual_income' => 'nullable|numeric|min:0',
+            'membership_number' => 'nullable|string|max:255|unique:members,membership_number,' . $member->id,
+            'bod_resolution_number' => 'nullable|string|max:255|unique:members,bod_resolution_number,' . $member->id,
+            'membership_type' => 'nullable|string|max:255',
+            'initial_capital_subscription' => 'nullable|numeric|min:0',
+            'initial_paid_up' => 'nullable|numeric|min:0',
+            'afp_issued_id' => 'nullable|string|max:255|unique:members,afp_issued_id,' . $member->id,
         ]);
 
         $member->update($validated_data);
 
-        return redirect()->route('members.index');
+        return redirect()->back();
     }
 
     public function destroy(Member $member)
@@ -152,5 +154,62 @@ class MemberController extends Controller
         $member->forceDelete();
 
         return redirect()->route('members.index');
+    }
+
+    public function addAttachments(Request $request, Member $member)
+    {
+        $request->validate([
+            'attachments.*' => 'required|file|mimes:jpg,jpeg,png,pdf,docx|max:5120',
+        ]);
+
+        foreach ($request->file('attachments', []) as $index => $file) {
+            if ($file && $file->isValid()) {
+                // Get original or provided filename
+                $originalName = $request->input("attachments.{$index}.file_name")
+                    ?? $file->getClientOriginalName();
+
+                $extension = $file->getClientOriginalExtension();
+                $maxLength = 50;
+
+                // Reserve space for dot + extension
+                $baseLength = $maxLength - (strlen($extension) + 1);
+
+                // Cut the base name safely
+                $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+                $baseName = Str::limit($baseName, $baseLength, '');
+
+                // Final safe name
+                $file_name = $baseName . '.' . $extension;
+
+                // Generate unique stored filename
+                $unique_name = Str::uuid() . '.' . $extension;
+
+                // Store the file in storage/app/public/attachments
+                $path = $file->storeAs('attachments', $unique_name, 'public');
+
+                // Save record
+                $member->attachments()->create([
+                    'file_name' => $file_name,
+                    'file_path' => '/storage/' . $path, // accessible via browser
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Files uploaded successfully');
+    }
+
+    public function removeAttachment(Attachment $attachment)
+    {
+        // Delete the file from storage if it exists
+        if (Storage::disk('public')->exists($attachment->file_path)) {
+            Storage::disk('public')->delete($attachment->file_path);
+        }
+
+        // Delete the record from the database
+        $attachment->forceDelete();
+
+        return redirect()->back()->with('success', 'Attachment removed successfully.');
     }
 }

@@ -36,10 +36,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::controller(ReportController::class)->group(function () {
             Route::get('/reports', 'index')->name('reports.index');
+            Route::get('/reports/export', 'exportExcel')->name('reports.export');
+
         });
 
         Route::controller(AnalyticsController::class)->group(function () {
             Route::get('/analytics', 'index')->name('analytics.index');
+        });
+
+        Route::controller(MemberController::class)->group(function(){
+            Route::post('/members/{member}/attachments', 'addAttachments')->name('member.addAttachments');
+            Route::delete('/members/{attachment}/attachments', 'removeAttachment')->name('member.removeAttachment');
         });
 
         Route::resource('members', MemberController::class);

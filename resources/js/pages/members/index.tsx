@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { router, useForm } from '@inertiajs/react';
-import { Edit, File, Plus, Search, Trash2, Upload, X } from 'lucide-react';
+import { Edit, File, Plus, Search, Trash2, Upload, View, X } from 'lucide-react';
 import React, { useState } from 'react';
 
 const religionOptions = ['Catholic', 'Protestant', 'Islam', 'Buddhism', 'Others'];
@@ -612,9 +612,9 @@ const Members = ({ members }: Props) => {
                                             <TableCell>{member.occupation}</TableCell>
                                             <TableCell>
                                                 <div className="flex gap-2">
-                                                    <Button variant="outline" size="sm">
-                                                        <Edit className="mr-1 h-4 w-4" />
-                                                        Edit
+                                                    <Button variant="outline" size="sm" onClick={() => router.get(`members/${member.id}`)}>
+                                                        <View className="mr-1 h-4 w-4" />
+                                                        View
                                                     </Button>
                                                     <Button variant="destructive" size="sm" onClick={() => router.delete(`members/${member.id}`)}>
                                                         <Trash2 className="mr-1 h-4 w-4" />
