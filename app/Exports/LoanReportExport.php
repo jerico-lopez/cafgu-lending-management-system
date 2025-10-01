@@ -3,17 +3,15 @@
 namespace App\Exports;
 
 use App\Models\Loan;
-use Illuminate\Contracts\View\View;
-use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Illuminate\Http\Request;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class LoanReportExport implements FromView, WithColumnFormatting, WithStyles, ShouldAutoSize
+class LoanReportExport implements FromCollection, WithHeadings, WithColumnFormatting, WithStyles, ShouldAutoSize
 {
     protected $month;
     protected $year;
@@ -26,7 +24,7 @@ class LoanReportExport implements FromView, WithColumnFormatting, WithStyles, Sh
         $this->patrolBase = $patrolBase;
     }
 
-    public function view(): View
+    public function collection()
     {
         $query = Loan::with(['member', 'patrolBase']);
 
@@ -40,32 +38,67 @@ class LoanReportExport implements FromView, WithColumnFormatting, WithStyles, Sh
             $query->where('patrol_base_id', $this->patrolBase);
         }
 
-        return view('exports.loan_report', [
-            'loans' => $query->get()
-        ]);
+        $loans = $query->get();
+
+        // Map loans into rows
+        return $loans->map(function ($loan, $index) {
+            return [
+                $index + 1,
+                $loan->patrolBase->name ?? '',
+                $loan->member->name ?? '',
+                $loan->principal_loan ?? 0,
+                $loan->previous_payment ?? 0,
+                $loan->principal_deduction ?? 0,
+                $loan->monthly_interest ?? 0,
+                $loan->processing_fee ?? 0,
+                $loan->zampen_benefits ?? 0,
+                $loan->unpaid_share_capital ?? 0,
+                $loan->total_deduction ?? 0,
+                $loan->balance ?? 0,
+                $loan->share ?? 0,
+            ];
+        });
+    }
+
+    public function headings(): array
+    {
+        return [
+            'No',
+            'Patrol Base',
+            'Name',
+            'Principal Loan',
+            'Prev. Payments',
+            'Principal Deduct',
+            '1 Month Int.',
+            'Proc. Fee',
+            'Zampen Benefits',
+            'Unpd Share Capital',
+            'Total Deduct',
+            'Balance',
+            'Share 2012-2024',
+        ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'D' => NumberFormat::FORMAT_NUMBER_00, // Principal Loan
-            'E' => NumberFormat::FORMAT_NUMBER_00, // Prev. Payments
-            'F' => NumberFormat::FORMAT_NUMBER_00, // Principal Deduct
-            'G' => NumberFormat::FORMAT_NUMBER_00, // 1 Month Int.
-            'H' => NumberFormat::FORMAT_NUMBER_00, // Proc. Fee
-            'I' => NumberFormat::FORMAT_NUMBER_00, // Zampen Benefits
-            'J' => NumberFormat::FORMAT_NUMBER_00, // Unpd Share Capital
-            'K' => NumberFormat::FORMAT_NUMBER_00, // Total Deduct
-            'L' => NumberFormat::FORMAT_NUMBER_00, // Balance
-            'M' => NumberFormat::FORMAT_NUMBER_00, // Share 2012-2024
+            'D' => NumberFormat::FORMAT_NUMBER_00,
+            'E' => NumberFormat::FORMAT_NUMBER_00,
+            'F' => NumberFormat::FORMAT_NUMBER_00,
+            'G' => NumberFormat::FORMAT_NUMBER_00,
+            'H' => NumberFormat::FORMAT_NUMBER_00,
+            'I' => NumberFormat::FORMAT_NUMBER_00,
+            'J' => NumberFormat::FORMAT_NUMBER_00,
+            'K' => NumberFormat::FORMAT_NUMBER_00,
+            'L' => NumberFormat::FORMAT_NUMBER_00,
+            'M' => NumberFormat::FORMAT_NUMBER_00,
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
         return [
-            // Bold header row (row 1)
-            1 => ['font' => ['bold' => true]],
+            1 => ['font' => ['bold' => true]], // header row
         ];
     }
 }
