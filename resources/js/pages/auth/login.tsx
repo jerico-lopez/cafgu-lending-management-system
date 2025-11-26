@@ -52,7 +52,7 @@ export default function Login() {
                         <div className="mb-4 flex justify-center">
                             <img src={bayanLogo} alt="Bayan ng Tungawan Logo" className="h-20 w-20 object-contain" />
                         </div>
-                        <h2 className="mb-2 text-2xl font-bold text-primary">Bayang Tungawan</h2>
+                        <h2 className="mb-2 text-2xl font-bold text-primary">Bayan ng Tungawan</h2>
                     </div>
 
                     <Card className="border-border/50 shadow-[var(--shadow-soft)]">
