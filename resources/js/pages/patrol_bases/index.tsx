@@ -1,3 +1,4 @@
+import ConfirmationModal from '@/components/ConfirmationModal';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -224,24 +225,16 @@ const PatrolBase = ({ patrol_bases, collectibleThisMonth }: Props) => {
                     </CardContent>
                 </Card>
             </div>
-            {isConfirmOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
-                        <h2 className="mb-4 text-lg font-semibold">Delete Patrol Base?</h2>
-                        <p className="mb-6">
-                            Are you sure you want to delete <strong>{selectedBaseName}</strong>? This action cannot be undone.
-                        </p>
-                        <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>
-                                Cancel
-                            </Button>
-                            <Button variant="destructive" onClick={handleConfirmDelete}>
-                                Delete
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmationModal
+                isOpen={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Delete Patrol Base?"
+                description={`Are you sure you want to delete ${selectedBaseName}? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                variant="destructive"
+            />
         </Layout>
     );
 };

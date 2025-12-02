@@ -1,3 +1,4 @@
+import ConfirmationModal from '@/components/ConfirmationModal';
 import Layout from '@/components/Layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -312,24 +313,16 @@ const Users = ({ users, collectibleThisMonth }: Props) => {
                     </CardContent>
                 </Card>
             </div>
-            {isConfirmOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
-                        <h2 className="mb-4 text-lg font-semibold">Delete User?</h2>
-                        <p className="mb-6">
-                            Are you sure you want to delete <strong>{selectedUserName}</strong>? This action cannot be undone.
-                        </p>
-                        <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>
-                                Cancel
-                            </Button>
-                            <Button variant="destructive" onClick={handleConfirmDelete}>
-                                Delete
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmationModal
+                isOpen={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Delete User?"
+                description={`Are you sure you want to delete ${selectedUserName}? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                variant="destructive"
+            />
         </Layout>
     );
 };
