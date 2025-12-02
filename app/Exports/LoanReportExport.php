@@ -4,17 +4,19 @@ namespace App\Exports;
 
 use App\Models\Loan;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class LoanReportExport implements FromCollection, WithHeadings, WithColumnFormatting, WithStyles, ShouldAutoSize
+class LoanReportExport implements FromCollection, ShouldAutoSize, WithColumnFormatting, WithHeadings, WithStyles
 {
     protected $month;
+
     protected $year;
+
     protected $patrolBase;
 
     public function __construct($month, $year, $patrolBase)
@@ -28,13 +30,15 @@ class LoanReportExport implements FromCollection, WithHeadings, WithColumnFormat
     {
         $query = Loan::with(['member', 'patrolBase']);
 
-        if ($this->month) {
+        if (! empty($this->month)) {
             $query->whereMonth('created_at', $this->month);
         }
-        if ($this->year) {
+
+        if (! empty($this->year)) {
             $query->whereYear('created_at', $this->year);
         }
-        if ($this->patrolBase) {
+
+        if (! empty($this->patrolBase)) {
             $query->where('patrol_base_id', $this->patrolBase);
         }
 
