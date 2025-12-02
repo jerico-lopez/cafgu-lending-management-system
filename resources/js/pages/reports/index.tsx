@@ -102,17 +102,19 @@ const ReportView = ({ reportData, patrolBases, filters }: Props) => {
                         </div>
 
                         <Button className="mt-2">Filter</Button>
-                        <Button asChild>
-                            <a href={`/reports/export?month=${month}&year=${year}&patrol_base=${patrolBase}`} target="_blank">
-                                Export to Excel
-                            </a>
-                        </Button>
+                        <form method="GET" action={`/reports/export`}>
+                            <input type="hidden" name="month" value={month} />
+                            <input type="hidden" name="year" value={year} />
+                            <input type="hidden" name="patrol_base" value={patrolBase} />
+
+                            <Button type="submit">Export to Excel</Button>
+                        </form>
                     </div>
                 </Card>
 
                 {/* Report Table */}
                 <div className="overflow-x-auto">
-                    <table className="min-w-full borde text-sm">
+                    <table className="borde min-w-full text-sm">
                         <thead>
                             <tr>
                                 <th className="border px-2 py-1 text-center">No</th>
