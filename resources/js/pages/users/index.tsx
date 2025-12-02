@@ -13,11 +13,12 @@ import React, { useEffect, useState } from 'react';
 
 interface Props {
     users: any[];
+    collectibleThisMonth: number;
 }
 
 const roleOptions = ['Admin', 'Treasurer', 'Encoder'];
 
-const Users = ({ users }: Props) => {
+const Users = ({ users, collectibleThisMonth }: Props) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
     const { data, setData, post, processing, errors } = useForm({
@@ -29,6 +30,7 @@ const Users = ({ users }: Props) => {
         password_confirmation: '',
     });
     const { toast } = useToast();
+    const monthName = new Date().toLocaleString('en-US', { month: 'long' });
 
     const filteredUsers = users.filter(
         (user) =>
@@ -102,7 +104,9 @@ const Users = ({ users }: Props) => {
                 <div className="page-header">
                     <h1 className="page-title">User Management</h1>
                     <div className="flex items-center gap-4">
-                        <div className="text-sm text-muted-foreground">₱0.00 Collectibles this month (August)</div>
+                        <div className="text-sm text-muted-foreground">
+                            {collectibleThisMonth ? `₱${collectibleThisMonth.toLocaleString()}` : '₱0.00'} Collectibles this month ({monthName})
+                        </div>
                         <Button onClick={() => setIsFormOpen(!isFormOpen)} className="btn-primary">
                             <Plus className="mr-2 h-4 w-4" />
                             New User

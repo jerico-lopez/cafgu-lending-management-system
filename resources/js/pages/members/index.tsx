@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { router, useForm } from '@inertiajs/react';
-import { Edit, File, Plus, Search, Trash2, Upload, View, X } from 'lucide-react';
+import { File, Plus, Search, Trash2, Upload, View, X } from 'lucide-react';
 import React, { useState } from 'react';
 
 const religionOptions = ['Catholic', 'Protestant', 'Islam', 'Buddhism', 'Others'];
@@ -18,6 +18,7 @@ const educationOptions = ['Elementary', 'High School', 'College', 'Vocational', 
 
 interface Props {
     members: any[];
+    collectibleThisMonth: number;
 }
 
 interface AttachmentWithName {
@@ -25,9 +26,10 @@ interface AttachmentWithName {
     file_name: string;
 }
 
-const Members = ({ members }: Props) => {
+const Members = ({ members, collectibleThisMonth }: Props) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const monthName = new Date().toLocaleString('en-US', { month: 'long' });
 
     const [previewUrls, setPreviewUrls] = useState<(string | null)[]>([]);
 
@@ -201,7 +203,9 @@ const Members = ({ members }: Props) => {
                 <div className="page-header">
                     <h1 className="page-title">Members Management</h1>
                     <div className="flex items-center gap-4">
-                        <div className="text-sm text-muted-foreground">₱0.00 Collectibles this month (August)</div>
+                        <div className="text-sm text-muted-foreground">
+                            {collectibleThisMonth ? `₱${collectibleThisMonth.toLocaleString()}` : '₱0.00'} Collectibles this month ({monthName})
+                        </div>
                         <Button onClick={() => setIsFormOpen(!isFormOpen)} className="btn-primary">
                             <Plus className="mr-2 h-4 w-4" />
                             New Member

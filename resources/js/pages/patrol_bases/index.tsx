@@ -12,9 +12,10 @@ import React, { useState } from 'react';
 
 interface Props {
     patrol_bases: any[];
+    collectibleThisMonth: number;
 }
 
-const PatrolBase = ({ patrol_bases }: Props) => {
+const PatrolBase = ({ patrol_bases, collectibleThisMonth }: Props) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
     const { data, setData, post, processing, errors } = useForm({
@@ -23,6 +24,7 @@ const PatrolBase = ({ patrol_bases }: Props) => {
         command_officer: '',
     });
     const { toast } = useToast();
+    const monthName = new Date().toLocaleString('en-US', { month: 'long' });
 
     const filteredBases = patrol_bases.filter(
         (base) => base.name.toLowerCase().includes(searchTerm.toLowerCase()) || base.location.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -71,7 +73,9 @@ const PatrolBase = ({ patrol_bases }: Props) => {
                 <div className="page-header">
                     <h1 className="page-title">Patrol Base Management</h1>
                     <div className="flex items-center gap-4">
-                        <div className="text-sm text-muted-foreground">₱0.00 Collectibles this month (August)</div>
+                        <div className="text-sm text-muted-foreground">
+                            {collectibleThisMonth ? `₱${collectibleThisMonth.toLocaleString()}` : '₱0.00'} Collectibles this month ({monthName})
+                        </div>
                         <Button onClick={() => setIsFormOpen(!isFormOpen)} className="btn-primary">
                             <Plus className="mr-2 h-4 w-4" />
                             New Patrol Base
