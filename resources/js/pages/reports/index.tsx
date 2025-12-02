@@ -100,8 +100,6 @@ const ReportView = ({ reportData, patrolBases, filters }: Props) => {
                                 </SelectContent>
                             </Select>
                         </div>
-
-                        <Button className="mt-2">Filter</Button>
                         <form method="GET" action={`/reports/export`}>
                             <input type="hidden" name="month" value={month} />
                             <input type="hidden" name="year" value={year} />
