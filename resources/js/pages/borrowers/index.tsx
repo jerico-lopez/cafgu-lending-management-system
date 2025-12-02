@@ -213,7 +213,7 @@ const Borrowers: React.FC<Props> = ({ members, loans, patrol_bases, collectibleT
                                         <TableHead>Status</TableHead>
                                         <TableHead>Borrower</TableHead>
                                         <TableHead>Amount</TableHead>
-                                        <TableHead>Actions</TableHead>
+                                        {/* <TableHead>Actions</TableHead> */}
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -230,7 +230,7 @@ const Borrowers: React.FC<Props> = ({ members, loans, patrol_bases, collectibleT
                                                 <TableCell>{getStatusBadge(loan.status)}</TableCell>
                                                 <TableCell className="font-medium">{loan.member?.name || 'Deleted Member'}</TableCell>
                                                 <TableCell className="font-medium">{loan.principal_loan}</TableCell>
-                                                <TableCell>
+                                                {/* <TableCell>
                                                     <div className="flex gap-2">
                                                         <Button variant="outline" size="sm">
                                                             <Eye className="mr-1 h-4 w-4" />
@@ -247,7 +247,7 @@ const Borrowers: React.FC<Props> = ({ members, loans, patrol_bases, collectibleT
                                                             </>
                                                         )}
                                                     </div>
-                                                </TableCell>
+                                                </TableCell> */}
                                             </TableRow>
                                         ))
                                     )}

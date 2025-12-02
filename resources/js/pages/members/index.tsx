@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { router, useForm } from '@inertiajs/react';
 import { File, Plus, Search, Trash2, Upload, View, X } from 'lucide-react';
 import React, { useState } from 'react';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
 const religionOptions = ['Catholic', 'Protestant', 'Islam', 'Buddhism', 'Others'];
 const genderOptions = ['Male', 'Female'];
@@ -30,6 +31,28 @@ const Members = ({ members, collectibleThisMonth }: Props) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
     const monthName = new Date().toLocaleString('en-US', { month: 'long' });
+
+    //confirmation modal
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
+    const openDeleteModal = (id: number) => {
+        setSelectedMemberId(id);
+        setIsDeleteModalOpen(true);
+    };
+    const handleDeleteConfirm = () => {
+        if (!selectedMemberId) return;
+
+        router.delete(`members/${selectedMemberId}`, {
+            onSuccess: () => {
+                setIsDeleteModalOpen(false);
+                setSelectedMemberId(null);
+                toast({ title: 'Member deleted successfully', variant: 'default' });
+            },
+            onError: () => {
+                toast({ title: 'Failed to delete member', variant: 'destructive' });
+            },
+        });
+    };
 
     const [previewUrls, setPreviewUrls] = useState<(string | null)[]>([]);
 
@@ -620,7 +643,7 @@ const Members = ({ members, collectibleThisMonth }: Props) => {
                                                         <View className="mr-1 h-4 w-4" />
                                                         View
                                                     </Button>
-                                                    <Button variant="destructive" size="sm" onClick={() => router.delete(`members/${member.id}`)}>
+                                                    <Button variant="destructive" size="sm" onClick={() => openDeleteModal(member.id)}>
                                                         <Trash2 className="mr-1 h-4 w-4" />
                                                         Delete
                                                     </Button>
@@ -634,6 +657,15 @@ const Members = ({ members, collectibleThisMonth }: Props) => {
                     </CardContent>
                 </Card>
             </div>
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Delete Member"
+                description="Are you sure you want to delete this member? This action cannot be undone."
+                confirmText="Delete"
+                variant="destructive"
+            />
         </Layout>
     );
 };

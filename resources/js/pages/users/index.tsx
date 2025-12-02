@@ -80,6 +80,31 @@ const Users = ({ users, collectibleThisMonth }: Props) => {
         });
     };
 
+    // delete modal
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+    const [selectedUserName, setSelectedUserName] = useState<string>('');
+    const handleDeleteClick = (user: any) => {
+        setSelectedUserId(user.id);
+        setSelectedUserName(user.name);
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (selectedUserId) {
+            router.delete(`/users/${selectedUserId}`, {
+                onSuccess: () => {
+                    toast({
+                        title: 'User Deleted',
+                        description: `${selectedUserName} has been removed`,
+                        variant: 'destructive',
+                    });
+                },
+            });
+        }
+        setIsConfirmOpen(false);
+    };
+
     const getStatusBadge = (status: string) => {
         return status === 'Active' ? <Badge className="status-active">Active</Badge> : <Badge className="status-rejected">Inactive</Badge>;
     };
@@ -261,7 +286,7 @@ const Users = ({ users, collectibleThisMonth }: Props) => {
                                                     <Button
                                                         variant="destructive"
                                                         size="sm"
-                                                        onClick={() => router.delete(`/users/${user.id}`)}
+                                                        onClick={() => handleDeleteClick(user)}
                                                         disabled={user.username === 'admin'}
                                                     >
                                                         <Trash2 className="mr-1 h-4 w-4" />
@@ -287,6 +312,24 @@ const Users = ({ users, collectibleThisMonth }: Props) => {
                     </CardContent>
                 </Card>
             </div>
+            {isConfirmOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
+                        <h2 className="mb-4 text-lg font-semibold">Delete User?</h2>
+                        <p className="mb-6">
+                            Are you sure you want to delete <strong>{selectedUserName}</strong>? This action cannot be undone.
+                        </p>
+                        <div className="flex justify-end gap-2">
+                            <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button variant="destructive" onClick={handleConfirmDelete}>
+                                Delete
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Layout>
     );
 };

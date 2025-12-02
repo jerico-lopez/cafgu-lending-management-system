@@ -1,3 +1,4 @@
+import ConfirmationModal from '@/components/ConfirmationModal';
 import Layout from '@/components/Layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { router, useForm } from '@inertiajs/react';
-import { Calculator, FileText, Plus, Search } from 'lucide-react';
+import { Calculator, Plus, Search } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface Props {
@@ -24,7 +25,7 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
         member_id: '',
         patrol_base_id: '',
         principal_loan: '',
-        previous_payment:'',
+        previous_payment: '',
         balance: '',
         share: '',
         zampen_benefits: '100',
@@ -39,9 +40,34 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
     });
     const { toast } = useToast();
 
-    const filteredLoans = loans.filter(
-        (loan) => loan.member?.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+    const filteredLoans = loans.filter((loan) => loan.member?.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    //conformation modal
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [selectedLoanId, setSelectedLoanId] = useState<number | null>(null);
+    const handleApproveClick = (loanId: number) => {
+        setSelectedLoanId(loanId);
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmApprove = () => {
+        if (selectedLoanId) {
+            router.put(
+                `/loans/${selectedLoanId}/approve`,
+                {},
+                {
+                    onSuccess: () => {
+                        toast({
+                            title: 'Loan Approved',
+                            description: 'The loan has been approved successfully.',
+                            variant: 'default',
+                        });
+                    },
+                },
+            );
+        }
+        setIsConfirmOpen(false);
+    };
 
     const handleInputChange = (field: string, value: string) => {
         setData((prev) => {
@@ -56,9 +82,9 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
         const zampen_benefits = parseFloat(form.zampen_benefits) || 1000;
         const processing_fee = parseFloat(form.processing_fee) || 500;
 
-        const principal_deduction = principal_loan  * 0.2;
+        const principal_deduction = principal_loan * 0.2;
         const monthly_interest = principal_loan * 0.03;
-        const unpaid_share_capital = principal_loan * 0.02; 
+        const unpaid_share_capital = principal_loan * 0.02;
         const total_deductions = principal_deduction + monthly_interest + unpaid_share_capital + zampen_benefits + processing_fee;
         const monthly_payment = principal_loan / 5;
 
@@ -312,8 +338,8 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
                                     {filteredLoans.map((loan) => (
                                         <TableRow key={loan.id}>
                                             <TableCell className="font-mono">{loan.id}</TableCell>
-                                            <TableCell className="font-medium">{loan.member?.name || "Deleted Member"}</TableCell>
-                                            <TableCell>{loan.patrol_base?.name || "Deleted Patrol Base"}</TableCell>
+                                            <TableCell className="font-medium">{loan.member?.name || 'Deleted Member'}</TableCell>
+                                            <TableCell>{loan.patrol_base?.name || 'Deleted Patrol Base'}</TableCell>
                                             <TableCell className="font-mono">₱{loan.principal_loan.toLocaleString()}</TableCell>
                                             <TableCell className="font-mono">₱{loan.monthly_payment.toLocaleString()}</TableCell>
                                             <TableCell>{getStatusBadge(loan.status)}</TableCell>
@@ -324,7 +350,7 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
                                                         View Details
                                                     </Button>
                                                     {loan.status === 'Pending' && (
-                                                        <Button size="sm" className="btn-success" onClick={() => router.put(`/loans/${loan.id}/approve`)}>
+                                                        <Button size="sm" className="btn-success" onClick={() => handleApproveClick(loan.id)}>
                                                             Approve
                                                         </Button>
                                                     )}
@@ -338,6 +364,16 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
                     </CardContent>
                 </Card>
             </div>
+            <ConfirmationModal
+                isOpen={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={handleConfirmApprove}
+                title="Approve Loan?"
+                description="Are you sure you want to approve this loan? This action cannot be undone."
+                confirmText="Approve"
+                cancelText="Cancel"
+                variant="default"
+            />
         </Layout>
     );
 };

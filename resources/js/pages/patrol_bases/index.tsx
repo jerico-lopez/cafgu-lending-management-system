@@ -9,7 +9,6 @@ import { router, useForm } from '@inertiajs/react';
 import { Edit, Plus, Search, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 
-
 interface Props {
     patrol_bases: any[];
     collectibleThisMonth: number;
@@ -29,6 +28,30 @@ const PatrolBase = ({ patrol_bases, collectibleThisMonth }: Props) => {
     const filteredBases = patrol_bases.filter(
         (base) => base.name.toLowerCase().includes(searchTerm.toLowerCase()) || base.location.toLowerCase().includes(searchTerm.toLowerCase()),
     );
+
+    //confirmation modal
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [selectedBaseId, setSelectedBaseId] = useState<number | null>(null);
+    const [selectedBaseName, setSelectedBaseName] = useState<string>('');
+    const handleDeleteClick = (base: any) => {
+        setSelectedBaseId(base.id);
+        setSelectedBaseName(base.name);
+        setIsConfirmOpen(true);
+    };
+    const handleConfirmDelete = () => {
+        if (selectedBaseId) {
+            router.delete(`/patrol-bases/${selectedBaseId}`, {
+                onSuccess: () => {
+                    toast({
+                        title: 'Patrol Base Deleted',
+                        description: `${selectedBaseName} has been removed`,
+                        variant: 'destructive',
+                    });
+                },
+            });
+        }
+        setIsConfirmOpen(false);
+    };
 
     const handleInputChange = (field: string, value: string) => {
         setData((prev) => ({ ...prev, [field]: value }));
@@ -180,7 +203,7 @@ const PatrolBase = ({ patrol_bases, collectibleThisMonth }: Props) => {
                                                         <Edit className="mr-1 h-4 w-4" />
                                                         Edit
                                                     </Button>
-                                                    <Button variant="destructive" size="sm" onClick={() => { handleDelete(base); router.delete(`patrol-bases/${base.id}`); }}>
+                                                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(base)}>
                                                         <Trash2 className="mr-1 h-4 w-4" />
                                                         Delete
                                                     </Button>
@@ -201,6 +224,24 @@ const PatrolBase = ({ patrol_bases, collectibleThisMonth }: Props) => {
                     </CardContent>
                 </Card>
             </div>
+            {isConfirmOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
+                        <h2 className="mb-4 text-lg font-semibold">Delete Patrol Base?</h2>
+                        <p className="mb-6">
+                            Are you sure you want to delete <strong>{selectedBaseName}</strong>? This action cannot be undone.
+                        </p>
+                        <div className="flex justify-end gap-2">
+                            <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button variant="destructive" onClick={handleConfirmDelete}>
+                                Delete
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Layout>
     );
 };
