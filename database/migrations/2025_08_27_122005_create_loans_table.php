@@ -12,8 +12,8 @@ return new class extends Migration {
     {
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('patrol_base_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('member_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('patrol_base_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('principal_loan', 12, 2); // The loan amount
             $table->decimal('previous_payment', 12, 2)->nullable();
             $table->decimal('principal_deduction', 12, 2);

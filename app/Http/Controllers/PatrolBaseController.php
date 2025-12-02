@@ -45,14 +45,14 @@ class PatrolBaseController extends Controller
 
         $patrolBase->update($request->only('name'));
 
-        return redirect()->route('patrol_bases.index');
+        return redirect()->route('patrol-bases.index');
     }
 
     public function destroy(PatrolBase $patrolBase)
     {
         $patrolBase->delete();
 
-        return redirect()->route('patrol_bases.index');
+        return redirect()->route('patrol-bases.index');
     }
 
     public function restore($id)
@@ -60,7 +60,7 @@ class PatrolBaseController extends Controller
         $patrolBase = PatrolBase::withTrashed()->findOrFail($id);
         $patrolBase->restore();
 
-        return redirect()->route('patrol_bases.index');
+        return redirect()->route('patrol-bases.index');
     }
 
     public function forceDelete($id)
@@ -68,6 +68,6 @@ class PatrolBaseController extends Controller
         $patrolBase = PatrolBase::withTrashed()->findOrFail($id);
         $patrolBase->forceDelete();
 
-        return redirect()->route('patrol_bases.index');
+        return redirect()->route('patrol-bases.index');
     }
 }

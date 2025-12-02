@@ -28,6 +28,8 @@ const Borrowers: React.FC<Props> = ({ members, loans, patrol_bases, collectibleT
         (member) => member.name.toLowerCase().includes(searchTerm.toLowerCase()) || member.tin_number.includes(searchTerm),
     );
 
+    const activeLoans = loans.filter((loan) => loan.member !== null);
+
     const handleCreateRecord = () => {
         if (!selectedMember || !selectedPatrolBase) {
             toast({
@@ -215,7 +217,7 @@ const Borrowers: React.FC<Props> = ({ members, loans, patrol_bases, collectibleT
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {loans.length === 0 ? (
+                                    {activeLoans.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={5} className="py-8 text-center">
                                                 <p className="text-muted-foreground">No loan records found</p>
@@ -223,10 +225,10 @@ const Borrowers: React.FC<Props> = ({ members, loans, patrol_bases, collectibleT
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        loans.map((loan) => (
+                                        activeLoans.map((loan) => (
                                             <TableRow key={loan.id}>
                                                 <TableCell>{getStatusBadge(loan.status)}</TableCell>
-                                                <TableCell className="font-medium">{loan.member.name}</TableCell>
+                                                <TableCell className="font-medium">{loan.member?.name || 'Deleted Member'}</TableCell>
                                                 <TableCell className="font-medium">{loan.principal_loan}</TableCell>
                                                 <TableCell>
                                                     <div className="flex gap-2">

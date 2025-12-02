@@ -40,7 +40,7 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
     const { toast } = useToast();
 
     const filteredLoans = loans.filter(
-        (loan) => loan.member.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        (loan) => loan.member?.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     const handleInputChange = (field: string, value: string) => {
@@ -312,8 +312,8 @@ const Loans = ({ loans, members, patrol_bases }: Props) => {
                                     {filteredLoans.map((loan) => (
                                         <TableRow key={loan.id}>
                                             <TableCell className="font-mono">{loan.id}</TableCell>
-                                            <TableCell className="font-medium">{loan.member.name}</TableCell>
-                                            <TableCell>{loan.patrol_base.name}</TableCell>
+                                            <TableCell className="font-medium">{loan.member?.name || "Deleted Member"}</TableCell>
+                                            <TableCell>{loan.patrol_base?.name || "Deleted Patrol Base"}</TableCell>
                                             <TableCell className="font-mono">₱{loan.principal_loan.toLocaleString()}</TableCell>
                                             <TableCell className="font-mono">₱{loan.monthly_payment.toLocaleString()}</TableCell>
                                             <TableCell>{getStatusBadge(loan.status)}</TableCell>

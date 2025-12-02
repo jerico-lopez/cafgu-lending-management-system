@@ -5,15 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Edit, Plus, Search, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 
-interface Props{
+
+interface Props {
     patrol_bases: any[];
 }
 
-const PatrolBase = ({patrol_bases} : Props) => {
+const PatrolBase = ({ patrol_bases }: Props) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
     const { data, setData, post, processing, errors } = useForm({
@@ -43,7 +44,7 @@ const PatrolBase = ({patrol_bases} : Props) => {
             return;
         }
 
-        post('/patrol-bases')
+        post('/patrol-bases');
 
         setData({ name: '', location: '', command_officer: '' });
         setIsFormOpen(false);
@@ -175,7 +176,7 @@ const PatrolBase = ({patrol_bases} : Props) => {
                                                         <Edit className="mr-1 h-4 w-4" />
                                                         Edit
                                                     </Button>
-                                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(base)}>
+                                                    <Button variant="destructive" size="sm" onClick={() => { handleDelete(base); router.delete(`patrol-bases/${base.id}`); }}>
                                                         <Trash2 className="mr-1 h-4 w-4" />
                                                         Delete
                                                     </Button>
